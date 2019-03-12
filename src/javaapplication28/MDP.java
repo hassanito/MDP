@@ -109,17 +109,33 @@ public class MDP {
        System.out.println("the closest number to "+poo +" is "+g.arr[g.findClosest_and_smaller(g.arr, poo)]);
        g.find_square_of_point(new Point(230,42));
        */
-        Graph g = new Graph(60,60,10);
+        Graph g = new Graph(50,50,2);
         
         //g.info();
-        int x =46;
-        int y =32;
-        System.out.println(x-x%7.5);
-        System.out.println(y-y%7.5);
-        Point p = new Point(x,y);
+        double x = 12.5;
+        double y = 24.9;
+       
         //g.squares_list.get(52).info();
         //System.out.println(g.squares_list.get(52).contains_point(p));
+        System.out.println(g.m);
         System.out.println(g.m.size());
+        //g.info();
+        Point point = new Point(x,y);
+        System.out.println(g.find_sq_point(point));
+        Square o = g.m.get(g.find_sq_point(point));
+        System.out.println("the square o is "+o);
+        o.info();
+        System.out.println(o.contains_point(point));
+        System.out.println(o.contains_point(new Point(12.5,12.5)));
+        System.out.println(o.contains_point(new Point(12.5,25)));
+        System.out.println(o.contains_point(new Point(25,12.5)));
+        System.out.println(o.contains_point(new Point(25,25)));
+
+        System.out.println(o.get_x());
+        System.out.println(o.get_y());
+        System.out.println(o.get_x_limits());
+        System.out.println(o.get_y_limits());
+        
     }
 
     }
@@ -180,7 +196,7 @@ class Square{
         empty = true;
         ID_counter++;
         ID=ID_counter; 
-        id_coor = coordinates.get_x() +""+coordinates.get_y();
+        id_coor = coordinates.get_x() +"-"+coordinates.get_y();
         // ID counter is static (class related) so it keeps increasing with every object square we create
         // ID is object related so every object created will have a value;
         x_limits = c.get_x()+size;
@@ -204,7 +220,7 @@ class Square{
     public String get_id_coor(){return id_coor;}
     public boolean contains_point(Point a){
         //contains point checks if a point belongs to this square 
-        if(coordinates.get_x()<a.get_x()&& coordinates.get_y() < a.get_y() && a.get_x()<= x_limits && a.get_y()<= y_limits){
+        if(coordinates.get_x()<=a.get_x()&& coordinates.get_y() <= a.get_y() && a.get_x()< x_limits && a.get_y()< y_limits){
                 //checks if the point is within the boundaries of the square - I considered that the point can belong to the x-y limit axis but not the x-y axis
                return true;
         }else{
@@ -266,7 +282,7 @@ class Graph{
     double square_size;
     double max;
     
-    //List <Square> squares_list = new ArrayList<Square>();
+    List <Square> squares_list = new ArrayList<Square>();
     Map <String,Square > m = new HashMap<String,Square>();
     //the hashmap is a sorted table of all the squares in the graph to make it easy to find which squares do points belong to
     //  Map <Double,List<List<Double>>> entry2 = new HashMap<Double,List<List<Double>>>();
@@ -296,7 +312,7 @@ class Graph{
             for(int j=0;j<y/square_size;j++){
                                 
                 Square a = new Square(new Point(i*square_size,j*square_size),square_size);
-                //squares_list.add(a);
+                squares_list.add(a);
                 m.put(a.get_id_coor(),a);
                 counter++;
             }
@@ -353,7 +369,7 @@ class Graph{
     public void add_object(Object o){
         /*this function will add the object to the graph ( the piece we are cutting on) 
         the ai algorithm will be applied inside this function on the object */
-           
+        
 
     }
     // Returns element closest to target in arr[] 
@@ -414,6 +430,7 @@ class Graph{
     //  between the target and both values. It assumes 
     // that val2 is greater than val1 and target lies 
     // between these two. 
+    
     private static Integer getClosest(Double val1, Double val2,  
                                          Double target) 
     { 
@@ -421,6 +438,7 @@ class Graph{
             return 0;         
         else 
             return 1;         
+    
     } 
     public static int findClosest_and_smaller(Double arr[],Double target){
         int index = findClosest(arr,target);
@@ -429,6 +447,20 @@ class Graph{
         }else{
             return index;
         }
+    }
+ 
+
+    public String find_sq_point(Point a){
+        //this function find the string id of the point a
+        double a1 = a.get_x();
+        a1 = a1-a1%this.square_size;
+        double a2 = a.get_y();
+        a2 = a2-a2%this.square_size;
+        
+        String s = Double.toString(a1)+"-"+Double.toString(a2);
+        
+        return s;
+        
     }
     public void info(){
         for(String i:m.keySet()){
