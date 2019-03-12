@@ -287,16 +287,6 @@ class Graph{
         
     }
     // we only use the fill table function once
-    /*
-    @Deprecated
-    private Double[] sorted_keys_toArray(){
-        //this  function takes the keys of the Hashmap and returns a sorted array
-        Set <Double> keys = entry2.keySet();
-        arr = new Double[keys.size()];
-        keys.toArray(arr);
-        Arrays.sort(arr);
-        return arr;
-    }*/
     
     private void fill_table(){
         //function should create a list of squares
