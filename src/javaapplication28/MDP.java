@@ -113,8 +113,8 @@ public class MDP {
         
         //g.info();
         double x = 12.5;
-        double y = 24.9;
-       
+        double y = 12.3;
+        /* 
         //g.squares_list.get(52).info();
         //System.out.println(g.squares_list.get(52).contains_point(p));
         System.out.println(g.m);
@@ -122,32 +122,40 @@ public class MDP {
         //g.info();
         Point point = new Point(x,y);
         System.out.println(g.find_sq_point(point));
-        Square o = g.m.get(g.find_sq_point(point));
-        System.out.println("the square o is "+o);
-        o.info();
-        System.out.println(o.contains_point(point));
-        System.out.println(o.contains_point(new Point(12.5,12.5)));
-        System.out.println(o.contains_point(new Point(12.5,25)));
-        System.out.println(o.contains_point(new Point(25,12.5)));
-        System.out.println(o.contains_point(new Point(25,25)));
-
-        System.out.println(o.get_x());
-        System.out.println(o.get_y());
-        System.out.println(o.get_x_limits());
-        System.out.println(o.get_y_limits());
+        g.m.get(g.find_sq_point(point)).info();
+        g.m.get(g.find_sq_point(point)).set_empty(true);
+        g.m.get(g.find_sq_point(point)).info();*/
+        System.out.println("-------------------------");
         
+        List<Point> lp = new ArrayList<Point>();
+        Point p =new Point(3,23,0);
+        lp.add(p);
+        Point po = new Point(12.56,25.2,0);
+        lp.add(po);
+        Object o = new Object(lp);
+        g.add_object(o);
+        g.info();
+        System.out.println("--------------------------");
+        g.m.get(g.find_sq_point(po)).remove_point(po);
+        g.info();
+        o.info();
+        
+       
     }
-
     }
     
-}
+
 
 class Point{
     private double x;
     private double y;
-    public Point(double x,double y){
+    //added the square id so every point will be recognized by the object it belongs to and vice versa
+    private int square_Id=0;
+    public Point(double x,double y,int sq_id){
         this.x =x;
         this.y =y;
+        square_Id = sq_id;
+        
     }
     public double get_x(){
         return this.x;
@@ -168,11 +176,17 @@ class Point{
 }
 class Object{
     //an object is a sequence of points
+    private static int object_Id_generator =0;
+    private int object_Id ;
+    
     public List<Point> sequence;
     public Object(List <Point> sq){
         sequence  =sq;
+        object_Id_generator++;
+        object_Id = object_Id_generator;
     }
     public void info(){
+        System.out.println("the object id is = "+object_Id);
         for(int i=0;i<sequence.size();i++){
             sequence.get(i).info();
         }
@@ -189,7 +203,7 @@ class Square{
     private double size;
     private double x_limits;
     private double y_limits;
-    private List<Point> points_in_square;
+    public List<Point> points_in_square;
     public Square(Point c,double s) {
         this.coordinates = c;
         this.size =s;
@@ -281,7 +295,7 @@ class Graph{
     double square_area;
     double square_size;
     double max;
-    
+    List <Object> objects_in_square  = new ArrayList<Object>();
     List <Square> squares_list = new ArrayList<Square>();
     Map <String,Square > m = new HashMap<String,Square>();
     //the hashmap is a sorted table of all the squares in the graph to make it easy to find which squares do points belong to
@@ -311,7 +325,7 @@ class Graph{
         for(int i=0;i<x/square_size;i++){
             for(int j=0;j<y/square_size;j++){
                                 
-                Square a = new Square(new Point(i*square_size,j*square_size),square_size);
+                Square a = new Square(new Point(i*square_size,j*square_size,0),square_size);
                 squares_list.add(a);
                 m.put(a.get_id_coor(),a);
                 counter++;
@@ -346,29 +360,15 @@ class Graph{
           
       }
     }
-    public int find_square_of_point(Point a){
-		//this function will find the square which the point belongs to in the most efficient way
-		// it will use the sorted hashtable as some kind of filter 
-		//we will find the x closest to 
-                /*
-                 Suggestion on how to solve this : use binary search https://www.geeksforgeeks.org/find-closest-number-array/
-                 to find the closest number in the sorted array.
-                 the array should be sorted once outside this function to reduce complexity since the graph is created only once
-                so the array wont change 
-                */
-                //the x_of_square finds the x of the square the points belongs to
-                Double x_of_square = arr[findClosest_and_smaller(arr,a.get_x())];
-                System.out.println(x_of_square);
-                List<List<Double>> keys = entry2.get(x_of_square);
-                for(int i=0;i<keys.size();i++){
-           // GO BACK HERE AND TRY TO FIX THIS MESS        
-                }
-                
- return 0;
-    }
+    
+ 
     public void add_object(Object o){
         /*this function will add the object to the graph ( the piece we are cutting on) 
         the ai algorithm will be applied inside this function on the object */
+        for(int i=0;i<o.sequence.size();i++){
+            m.get(this.find_sq_point(o.sequence.get(i))).add_point(o.sequence.get(i));
+            System.out.println("point added");
+        }
         
 
     }
@@ -468,5 +468,6 @@ class Graph{
             m.get(i).info();
         }
     }
+    public void translate_right(Objec)
     
 }
