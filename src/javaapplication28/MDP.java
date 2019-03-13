@@ -109,11 +109,9 @@ public class MDP {
        System.out.println("the closest number to "+poo +" is "+g.arr[g.findClosest_and_smaller(g.arr, poo)]);
        g.find_square_of_point(new Point(230,42));
        */
-        Graph g = new Graph(50,50,2);
         
         //g.info();
-        double x = 12.5;
-        double y = 12.3;
+        
         /* 
         //g.squares_list.get(52).info();
         //System.out.println(g.squares_list.get(52).contains_point(p));
@@ -124,7 +122,7 @@ public class MDP {
         System.out.println(g.find_sq_point(point));
         g.m.get(g.find_sq_point(point)).info();
         g.m.get(g.find_sq_point(point)).set_empty(true);
-        g.m.get(g.find_sq_point(point)).info();*/
+        g.m.get(g.find_sq_point(point)).info();
         System.out.println("-------------------------");
         
         List<Point> lp = new ArrayList<Point>();
@@ -154,8 +152,23 @@ public class MDP {
       /*g.m.get(g.find_sq_point(po)).remove_point(po);
         g.info();
         o.info();
-        */
+        
         g.remove_object(o);
+        g.info();
+                System.out.println("--------------------------");
+                o.info();
+                //o.translate_object_right(100, 200);
+                o.info();
+        */
+        Graph g = new Graph(50,50,1);
+        g.info();
+        Object bon = new Object();
+        bon.add_point(new Point(2,2,0));
+        g.add_object(bon);
+        System.out.println("=========================================");
+        g.info();
+        System.out.println("=========================================");
+        g.translate_right(1);
         g.info();
     }
     }
@@ -208,10 +221,25 @@ class Object{
         object_Id_generator++;
         object_Id = object_Id_generator;
     }
+    public int get_Id(){
+    return object_Id;}
     public void info(){
         System.out.println("the object id is = "+object_Id);
         for(int i=0;i<sequence.size();i++){
             sequence.get(i).info();
+        }
+    }
+    public void translate_object_right(double size,double x_limits){
+        //this function translates all the points of object by a value = size
+        for(int i=0;i<this.sequence.size();i++){
+            
+            Point current = this.sequence.get(i);
+            //checks if the point is bigger than the limits - I should add something that stops this in the future
+            if(current.get_x()+size<=x_limits){
+                current.set_x(current.get_x()+size);
+            }else{
+                System.out.println("error this point is over the limit");
+            }
         }
     }
     
@@ -318,7 +346,8 @@ class Graph{
     double square_area;
     double square_size;
     double max;
-    List <Object> objects_in_square  = new ArrayList<Object>();
+    //List <Object> objects_in_square  = new ArrayList<Object>();
+    Map <Integer,Object> objects_in_square =  new HashMap<Integer,Object>();
     List <Square> squares_list = new ArrayList<Square>();
     Map <String,Square > m = new HashMap<String,Square>();
     //the hashmap is a sorted table of all the squares in the graph to make it easy to find which squares do points belong to
@@ -347,6 +376,7 @@ class Graph{
                                 
                 Square a = new Square(new Point(i*square_size,j*square_size,0),square_size);
                 squares_list.add(a);
+                
                 m.put(a.get_id_coor(),a);
                 counter++;
             }
@@ -385,7 +415,7 @@ class Graph{
     public void add_object(Object o){
         /*this function will add the object to the graph ( the piece we are cutting on) 
         the ai algorithm will be applied inside this function on the object */
-        this.objects_in_square.add(o);
+        this.objects_in_square.put(o.get_Id(), o);
         for(int i=0;i<o.sequence.size();i++){
             m.get(this.find_sq_point(o.sequence.get(i))).add_point(o.sequence.get(i));
             System.out.println("point added");
@@ -395,7 +425,7 @@ class Graph{
     }
     public void remove_object(Object o){
         //this function removes the object that the add_object functions puts in the graph
-        this.objects_in_square.remove(o);
+        this.objects_in_square.remove(o.get_Id());
         for(int i=0;i<o.sequence.size();i++){
             m.get(this.find_sq_point(o.sequence.get(i))).remove_point(o.sequence.get(i));
             System.out.println("point removed");
@@ -498,12 +528,20 @@ class Graph{
             m.get(i).info();
         }
         System.out.println("the objects in this graph are : ");
-        for(int i=0;i<this.objects_in_square.size();i++){
+        for(int i:objects_in_square.keySet()){
             this.objects_in_square.get(i).info();
         }
     }
     public void translate_right(int object_id){
-        
+        //first check if the object is in the graph  
+        if(this.objects_in_square.containsKey(object_id)){
+            Object current = this.objects_in_square.get(object_id);
+            this.remove_object(current);
+            current.translate_object_right(this.square_size,this.x);
+            this.add_object(current);
+        }else{
+            System.out.println("OBJECT with id = "+object_id+" is not in the egraph");
+        }
     }
     
 }
