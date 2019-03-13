@@ -132,15 +132,31 @@ public class MDP {
         lp.add(p);
         Point po = new Point(12.56,25.2,0);
         lp.add(po);
-        Object o = new Object(lp);
+        Object o = new Object();
+        o.add_point(p);
+        o.add_point(po);
         g.add_object(o);
+        List<Point> lp1 = new ArrayList<Point>();
+        Point p1 =new Point(5,43,0);
+        Point p3 = new Point(3,24,0);
+        lp1.add(p3);
+        lp1.add(p1);
+        Point po1 = new Point(26,37.7,0);
+        lp1.add(po1);
+        Object o1 = new Object();
+        o1.add_point(po1);
+        o1.add_point(p1);
+        o1.add_point(p3);
+        g.add_object(o1);
         g.info();
         System.out.println("--------------------------");
-        g.m.get(g.find_sq_point(po)).remove_point(po);
+       
+      /*g.m.get(g.find_sq_point(po)).remove_point(po);
         g.info();
         o.info();
-        
-       
+        */
+        g.remove_object(o);
+        g.info();
     }
     }
     
@@ -157,6 +173,8 @@ class Point{
         square_Id = sq_id;
         
     }
+    public int get_Id(){return square_Id;}
+    public void set_Id(int Id){this.square_Id= Id;}
     public double get_x(){
         return this.x;
     }
@@ -170,7 +188,7 @@ class Point{
         this.y=y;
     }
     public void info(){
-        System.out.println("x = "+x+" , y= "+y);
+        System.out.println("x = "+x+" , y= "+y+ " belongs to object id= "+ this.square_Id );
     }
 
 }
@@ -180,8 +198,13 @@ class Object{
     private int object_Id ;
     
     public List<Point> sequence;
-    public Object(List <Point> sq){
-        sequence  =sq;
+    public void add_point(Point a){
+        a.set_Id(object_Id);
+        sequence.add(a);
+    }
+    
+    public Object(){
+        sequence  = new ArrayList<Point>();
         object_Id_generator++;
         object_Id = object_Id_generator;
     }
@@ -308,12 +331,9 @@ class Graph{
         this.number_of_squares =Math.pow(4,n);
         square_area = (x*y)/number_of_squares;
         square_size = Math.sqrt(square_area);
-        //max = Math.sqrt(number_of_squares);
         fill_table();
         System.out.println("heyyaaa ");
-          //  sort_hashtable();
-        //System.out.println(entry2);
-        // arr = sorted_keys_toArray();
+
         
     }
     // we only use the fill table function once
@@ -365,12 +385,22 @@ class Graph{
     public void add_object(Object o){
         /*this function will add the object to the graph ( the piece we are cutting on) 
         the ai algorithm will be applied inside this function on the object */
+        this.objects_in_square.add(o);
         for(int i=0;i<o.sequence.size();i++){
             m.get(this.find_sq_point(o.sequence.get(i))).add_point(o.sequence.get(i));
             System.out.println("point added");
         }
         
 
+    }
+    public void remove_object(Object o){
+        //this function removes the object that the add_object functions puts in the graph
+        this.objects_in_square.remove(o);
+        for(int i=0;i<o.sequence.size();i++){
+            m.get(this.find_sq_point(o.sequence.get(i))).remove_point(o.sequence.get(i));
+            System.out.println("point removed");
+        }
+        
     }
     // Returns element closest to target in arr[] 
     public static Integer findClosest(Double arr[], Double target) 
@@ -467,7 +497,13 @@ class Graph{
             System.out.println( "key = "+i);
             m.get(i).info();
         }
+        System.out.println("the objects in this graph are : ");
+        for(int i=0;i<this.objects_in_square.size();i++){
+            this.objects_in_square.get(i).info();
+        }
     }
-    public void translate_right(Objec)
+    public void translate_right(int object_id){
+        
+    }
     
 }
