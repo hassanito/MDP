@@ -6,6 +6,7 @@
 package javaapplication28;
 import java.util.*;
 import java.math.*;
+import java.util.function.Function;
 
 /**
  *
@@ -190,6 +191,7 @@ public class MDP {
        
         g.info();
         System.out.println("=================================================");
+       /* 
         g.translate_up(1);
         g.info();
         g.translate_up(1);
@@ -217,7 +219,18 @@ public class MDP {
         g.translate_left(1);
         g.translate_down(1);
         g.info();
-                }
+        */
+        double a =g.up.apply(test_object);
+        
+        double b = g.right.apply(test_object);
+        g.translate_right(1);
+        double c = g.right.apply(test_object);
+        System.out.println("==========================================");
+        g.info();
+         System.out.println("b= "+b);
+         System.out.println("a= "+a);
+         System.out.println("c= "+c);
+    }
     }
     
 
@@ -505,7 +518,36 @@ class Square{
 
 
 class Graph{
-    // the graph is the piece we are cutting basically
+    /*
+      Function UP uses functionnal programming
+      up takes an object and returns a double
+      up takes an object ,moves it up to get the heuristic value of the up move then it gets the object 
+      to where it was 
+      it might be a little bit complex so the complexity needs to be revised later */
+    Function<Object, Double> up = (Object input) -> {
+            this.translate_up(input.get_Id());
+            double a =this.objects_in_square.get(input.get_Id()).heuristic();
+            this.translate_down(input.get_Id());
+            return a;
+        };
+    Function<Object, Double> down = (Object input) -> {
+            this.translate_down(input.get_Id());
+            double a =this.objects_in_square.get(input.get_Id()).heuristic();
+            this.translate_up(input.get_Id());
+            return a;
+        };
+        Function<Object, Double> right = (Object input) -> {
+            this.translate_right(input.get_Id());
+            double a =this.objects_in_square.get(input.get_Id()).heuristic();
+            this.translate_left(input.get_Id());
+            return a;
+        };
+        Function<Object, Double> left = (Object input) -> {
+            this.translate_left(input.get_Id());
+            double a =this.objects_in_square.get(input.get_Id()).heuristic();
+            this.translate_right(input.get_Id());
+            return a;
+        };
     double x;
     double y;
     double number_of_squares;
