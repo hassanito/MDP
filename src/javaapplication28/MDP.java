@@ -189,17 +189,8 @@ public class MDP {
         g.add_object(test_object);
        
         g.info();
-        System.out.println("=================================================");
         g.translate_right(1);
-        g.info();
         System.out.println("=================================================");
-        g.translate_left(1);
-        g.info();
-        System.out.println("=================================================");
-        g.translate_up(1);
-        g.info();
-        System.out.println("=================================================");
-        g.translate_down(1);
         g.info();
         
     }
@@ -262,6 +253,30 @@ class Object{
         xsize_is_at_limits=false;
         ysize_is_at_limits=false;
     }
+    public double x_heuristic(){
+        double h_x=0;
+        //this function sums the points that make up the object to measure the overall distance from the object to the x axis
+        //it returns the sum of all x's
+        for(int i=0;i<this.sequence.size();i++){
+            h_x += this.sequence.get(i).get_x();
+        }
+        return h_x;
+    
+    }
+    public double y_heuristic(){
+        double h_y=0;
+        //this function sums the points that make up the object to measure the overall distance from the object to the x axis
+        //it returns the sum of all x's
+        for(int i=0;i<this.sequence.size();i++){
+            h_y += this.sequence.get(i).get_y();
+        }
+        return h_y;
+    
+    }
+    public double heuristic(){
+        //this function takes the average of the x and y heuristic
+        return this.x_heuristic()+this.y_heuristic();
+    }
     public int get_Id(){
     return object_Id;}
     public void info(){
@@ -269,6 +284,10 @@ class Object{
         for(int i=0;i<sequence.size();i++){
             sequence.get(i).info();
         }
+        System.out.println("the value of the x heuristic is "+ this.x_heuristic());
+        System.out.println("the value of the y heuristic is "+ this.y_heuristic());
+        System.out.println("the value of the heuristic is "+ this.heuristic());
+
     }
     public void translate_object_right(double size,double x_limits){
         //this function translates all the points of object by a value = size   
@@ -417,6 +436,8 @@ class Square{
             this.set_empty(true);
         }
     }
+    
+    
     public void info(){
         System.out.print("square COOR "+id_coor+" with an id = "+ID+" of size = "+ size +" and coordinates ");
         coordinates.info();
