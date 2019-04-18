@@ -185,15 +185,39 @@ public class MDP {
         test_object.info();
   
         System.out.println("=================================================");
-        Graph g = new Graph(100,100,1);
+        Graph g = new Graph(100,100,2);
         g.add_object(test_object);
        
         g.info();
-        g.translate_right(1);
         System.out.println("=================================================");
+        g.translate_up(1);
         g.info();
-        
-    }
+        g.translate_up(1);
+        g.info();
+        g.translate_up(1);
+        g.info();
+        g.translate_up(1);
+        g.info();
+        g.translate_up(1);
+        g.translate_down(1);
+        g.info();
+        g.translate_right(1);
+        g.info();
+        g.translate_right(1);
+        g.info();
+        g.translate_right(1);
+        g.info();
+        g.translate_right(1);
+        g.translate_up(1);
+        g.info();
+        g.translate_up(1);
+        g.translate_down(1);
+        g.translate_down(1);
+        g.translate_left(1);
+        g.translate_left(1);
+        g.translate_down(1);
+        g.info();
+                }
     }
     
 
@@ -239,6 +263,7 @@ class Object{
         sequence.add(a);
     }
     //these object indicate if an object is at the limits and cant be translated further
+    //they act as limit switches that turn on once we hit the limits
     private boolean x_is_at_limits;
     private boolean y_is_at_limits;
     private boolean xsize_is_at_limits;
@@ -279,6 +304,18 @@ class Object{
     }
     public int get_Id(){
     return object_Id;}
+    public boolean xlimits(){
+        return this.x_is_at_limits;
+    };
+    public boolean ylimits(){
+       return this.y_is_at_limits;
+    };
+    public boolean xsizelimits(){
+        return this.xsize_is_at_limits;
+    }
+    public boolean ysizelimits(){
+        return this.ysize_is_at_limits;
+    }
     public void info(){
         System.out.println("the object id is = "+object_Id);
         for(int i=0;i<sequence.size();i++){
@@ -309,6 +346,8 @@ class Object{
             }
         }
         if(this.xsize_is_at_limits==false){
+            //the first statement removes the limits that the object might have had hit  before
+            this.x_is_at_limits =false;
             for(int i=0;i<this.sequence.size();i++){
                 Point current = this.sequence.get(i);
                 current.set_x(current.get_x()+size);            }
@@ -323,6 +362,8 @@ class Object{
             }
         }
         if(this.x_is_at_limits==false){
+            //the first statement removes the limits that the object might have had hit  before
+            this.xsize_is_at_limits =false;
         for(int i=0;i<this.sequence.size();i++){
             Point current = this.sequence.get(i);
             current.set_x(current.get_x()-size);
@@ -330,6 +371,7 @@ class Object{
         }
     }
     public void translate_object_up(double size,double y_limits){
+        
         for(int i=0;i<this.sequence.size();i++){
             Point current = this.sequence.get(i);
             if(current.get_y()+size>=y_limits){
@@ -337,7 +379,9 @@ class Object{
                break;
             }
         }
-        if(this.xsize_is_at_limits==false){
+        if(this.ysize_is_at_limits==false){
+            //the first statement removes the limits that the object might have had hit  before
+            this.y_is_at_limits =false;
         for(int i=0;i<this.sequence.size();i++){
             Point current = this.sequence.get(i);
             current.set_y(current.get_y()+size);
@@ -345,6 +389,7 @@ class Object{
         }
     }
     public void translate_object_down(double size){
+        
         for(int i=0;i<this.sequence.size();i++){
             Point current = this.sequence.get(i);
             if(current.get_y()-size<0){
@@ -353,6 +398,8 @@ class Object{
             }
         }
         if(this.y_is_at_limits==false){
+            //the first statement removes the limits that the object might have had hit  before
+            this.ysize_is_at_limits =false;
         for(int i=0;i<this.sequence.size();i++){
             Point current = this.sequence.get(i);
             current.set_y(current.get_y()-size);
@@ -659,9 +706,13 @@ class Graph{
         //first check if the object is in the graph  
         if(this.objects_in_square.containsKey(object_id)){
             Object current = this.objects_in_square.get(object_id);
+            if(current.xsizelimits()==false){
             this.remove_object(current);
             current.translate_object_right(this.square_size,this.x);
             this.add_object(current);
+            }else{
+                System.out.println("current xsizelimits are true cant move object right ");
+            }
         }else{
             System.out.println("OBJECT with id = "+object_id+" is not in the egraph");
         }
@@ -670,9 +721,13 @@ class Graph{
         //first check if the object is in the graph  
         if(this.objects_in_square.containsKey(object_id)){
             Object current = this.objects_in_square.get(object_id);
+            if(current.xlimits()==false){
             this.remove_object(current);
             current.translate_object_left(this.square_size);
             this.add_object(current);
+            }else{
+                System.out.println("current xlimits are true cant move object left");
+            }
         }else{
             System.out.println("OBJECT with id = "+object_id+" is not in the egraph");
         }
@@ -681,9 +736,14 @@ class Graph{
         //first check if the object is in the graph  
         if(this.objects_in_square.containsKey(object_id)){
             Object current = this.objects_in_square.get(object_id);
+            if(current.ysizelimits()==false){
+                
             this.remove_object(current);
             current.translate_object_up(this.square_size,this.y);
             this.add_object(current);
+            }else{
+                System.out.println("current ysizelimits are true cant move object up ");
+            }
         }else{
             System.out.println("OBJECT with id = "+object_id+" is not in the egraph");
         }
@@ -692,9 +752,13 @@ class Graph{
         //first check if the object is in the graph  
         if(this.objects_in_square.containsKey(object_id)){
             Object current = this.objects_in_square.get(object_id);
+            if(current.ylimits()==false){
             this.remove_object(current);
             current.translate_object_down(this.square_size);
             this.add_object(current);
+            }else{
+                System.out.println("current ylimits are true cant move object down ");
+            }
         }else{
             System.out.println("OBJECT with id = "+object_id+" is not in the egraph");
         }
