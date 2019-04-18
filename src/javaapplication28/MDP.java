@@ -159,7 +159,7 @@ public class MDP {
                 o.info();
                 //o.translate_object_right(100, 200);
                 o.info();
-        */
+        
         Graph g = new Graph(50,50,1);
         g.info();
         Object bon = new Object();
@@ -170,6 +170,38 @@ public class MDP {
         System.out.println("=========================================");
         g.translate_right(1);
         g.info();
+        */
+        System.out.println("test");
+        Point test = new Point(26,2,3);
+        //test.info();
+        Point test2 = new Point(0,1,3);
+        //test2.info();
+        Object test_object = new Object();
+        //test_object.info();
+        Object test_object2 = new Object();
+        //test_object2.info();
+        test_object.add_point(test);
+        test_object.add_point(test2);
+        test_object.info();
+  
+        System.out.println("=================================================");
+        Graph g = new Graph(100,100,1);
+        g.add_object(test_object);
+       
+        g.info();
+        System.out.println("=================================================");
+        g.translate_right(1);
+        g.info();
+        System.out.println("=================================================");
+        g.translate_left(1);
+        g.info();
+        System.out.println("=================================================");
+        g.translate_up(1);
+        g.info();
+        System.out.println("=================================================");
+        g.translate_down(1);
+        g.info();
+        
     }
     }
     
@@ -215,11 +247,20 @@ class Object{
         a.set_Id(object_Id);
         sequence.add(a);
     }
+    //these object indicate if an object is at the limits and cant be translated further
+    private boolean x_is_at_limits;
+    private boolean y_is_at_limits;
+    private boolean xsize_is_at_limits;
+    private boolean ysize_is_at_limits;
     
     public Object(){
         sequence  = new ArrayList<Point>();
         object_Id_generator++;
         object_Id = object_Id_generator;
+        x_is_at_limits=false;
+        y_is_at_limits=false;
+        xsize_is_at_limits=false;
+        ysize_is_at_limits=false;
     }
     public int get_Id(){
     return object_Id;}
@@ -230,22 +271,79 @@ class Object{
         }
     }
     public void translate_object_right(double size,double x_limits){
-        //this function translates all the points of object by a value = size
+        //this function translates all the points of object by a value = size   
+        //the first loop checks if all the points will be inside the graph when translate 
+        //the second loop puts translates them once we know they will not be outside the limits
+        //PPPPPSSSSSSS : this algorithms should be reviewed to improve complexity later
+         
+        //maybe add a test to check that the object is at the limit without going into the loop
         for(int i=0;i<this.sequence.size();i++){
             
             Point current = this.sequence.get(i);
             //checks if the point is bigger than the limits - I should add something that stops this in the future
             if(current.get_x()+size<=x_limits){
-                current.set_x(current.get_x()+size);
+               // current.set_x(current.get_x()+size);
             }else{
+                this.xsize_is_at_limits = true;
                 System.out.println("error this point is over the limit");
+                break;
+            }
+        }
+        if(this.xsize_is_at_limits==false){
+            for(int i=0;i<this.sequence.size();i++){
+                Point current = this.sequence.get(i);
+                current.set_x(current.get_x()+size);            }
+        }
+    }
+    public void translate_object_left(double size){
+        for(int i=0;i<this.sequence.size();i++){
+            Point current = this.sequence.get(i);
+            if(current.get_x()-size<0){
+               this.x_is_at_limits=true;
+               break;
+            }
+        }
+        if(this.x_is_at_limits==false){
+        for(int i=0;i<this.sequence.size();i++){
+            Point current = this.sequence.get(i);
+            current.set_x(current.get_x()-size);
+            }
+        }
+    }
+    public void translate_object_up(double size,double y_limits){
+        for(int i=0;i<this.sequence.size();i++){
+            Point current = this.sequence.get(i);
+            if(current.get_y()+size>=y_limits){
+               this.ysize_is_at_limits=true;
+               break;
+            }
+        }
+        if(this.xsize_is_at_limits==false){
+        for(int i=0;i<this.sequence.size();i++){
+            Point current = this.sequence.get(i);
+            current.set_y(current.get_y()+size);
+            }
+        }
+    }
+    public void translate_object_down(double size){
+        for(int i=0;i<this.sequence.size();i++){
+            Point current = this.sequence.get(i);
+            if(current.get_y()-size<0){
+               this.y_is_at_limits=true;
+               break;
+            }
+        }
+        if(this.y_is_at_limits==false){
+        for(int i=0;i<this.sequence.size();i++){
+            Point current = this.sequence.get(i);
+            current.set_y(current.get_y()-size);
             }
         }
     }
     
 }
 class Square{
-    // maybe I should something to check that no 2 squares at the same point should exist
+    // maybe I should do something to check that no 2 squares at the same point should exist
     private static int ID_counter =0;// id generator - every square has a specific id that will be mapped to it later 
     private int ID;
     private String id_coor;
@@ -347,8 +445,11 @@ class Graph{
     double square_size;
     double max;
     //List <Object> objects_in_square  = new ArrayList<Object>();
+    //objects_in_Square stores the objects that are added to the graph and points to them using the mapping
     Map <Integer,Object> objects_in_square =  new HashMap<Integer,Object>();
+    //squares_list contains the list of squares that form the graph
     List <Square> squares_list = new ArrayList<Square>();
+    //m contains is a mapping fromt the coordinates to the squares 
     Map <String,Square > m = new HashMap<String,Square>();
     //the hashmap is a sorted table of all the squares in the graph to make it easy to find which squares do points belong to
     //  Map <Double,List<List<Double>>> entry2 = new HashMap<Double,List<List<Double>>>();
@@ -417,6 +518,7 @@ class Graph{
         the ai algorithm will be applied inside this function on the object */
         this.objects_in_square.put(o.get_Id(), o);
         for(int i=0;i<o.sequence.size();i++){
+            // we first find the square which the points is in then we put it inside the square
             m.get(this.find_sq_point(o.sequence.get(i))).add_point(o.sequence.get(i));
             System.out.println("point added");
         }
@@ -543,5 +645,39 @@ class Graph{
             System.out.println("OBJECT with id = "+object_id+" is not in the egraph");
         }
     }
+    public void translate_left(int object_id){
+        //first check if the object is in the graph  
+        if(this.objects_in_square.containsKey(object_id)){
+            Object current = this.objects_in_square.get(object_id);
+            this.remove_object(current);
+            current.translate_object_left(this.square_size);
+            this.add_object(current);
+        }else{
+            System.out.println("OBJECT with id = "+object_id+" is not in the egraph");
+        }
+    }
+    public void translate_up(int object_id){
+        //first check if the object is in the graph  
+        if(this.objects_in_square.containsKey(object_id)){
+            Object current = this.objects_in_square.get(object_id);
+            this.remove_object(current);
+            current.translate_object_up(this.square_size,this.y);
+            this.add_object(current);
+        }else{
+            System.out.println("OBJECT with id = "+object_id+" is not in the egraph");
+        }
+    }
+    public void translate_down(int object_id){
+        //first check if the object is in the graph  
+        if(this.objects_in_square.containsKey(object_id)){
+            Object current = this.objects_in_square.get(object_id);
+            this.remove_object(current);
+            current.translate_object_down(this.square_size);
+            this.add_object(current);
+        }else{
+            System.out.println("OBJECT with id = "+object_id+" is not in the egraph");
+        }
+    }
+    
     
 }
