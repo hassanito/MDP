@@ -194,28 +194,29 @@ public class MDP {
   
         
         g.info();
-        System.out.println(g.find_best_move(1));
+       
        
     
-        
-        //g.translate_up(1);
-        //g.do_best_move(1);
-        //g.do_best_move(1);
-        //System.out.println("YEEEEHAWWWW");
+ 
+ 
+        test_object2.info();
+        Point p3 = new Point(0,0,0);
+        test_object2.add_point(p3);
+        test_object2.info();
         //g.translate_right(1);
-        //g.do_best_move(1);
-        //g.do_best_move(1);
-        g.translate_right(1);
-        g.translate_right(1);
+        g.objects_in_square.get(1).translate_object_up(g.square_size, g.y);
+        g.translate_down(1);
+        g.info();
         g.translate_up(1);
-        //g.do_best_move(1);
-        //g.do_best_move(1);
-        //g.do_best_move(1);
-        //g.do_best_move(1);
+        g.translate_up(1);
+        g.translate_up(1);
+        g.translate_right(1);
+        g.translate_right(1);
         g.do_set_of_best_moves(1);
         g.info();
-        
         //System.out.println(g.find_best_move(1));
+        
+        //g.check_collusion(test_object2);
         
     }
     }
@@ -335,9 +336,9 @@ class Object{
         //maybe add a test to check that the object is at the limit without going into the loop
         for(int i=0;i<this.sequence.size();i++){
             
-            Point current = this.sequence.get(i);
+            
             //checks if the point is bigger than the limits - I should add something that stops this in the future
-            if(current.get_x()+size<=x_limits){
+            if(this.sequence.get(i).get_x()+size<=x_limits){
                // current.set_x(current.get_x()+size);
             }else{
                 this.xsize_is_at_limits = true;
@@ -349,14 +350,14 @@ class Object{
             //the first statement removes the limits that the object might have had hit  before
             this.x_is_at_limits =false;
             for(int i=0;i<this.sequence.size();i++){
-                Point current = this.sequence.get(i);
-                current.set_x(current.get_x()+size);            }
+               
+                this.sequence.get(i).set_x(this.sequence.get(i).get_x()+size);            }
         }
     }
     public void translate_object_left(double size){
         for(int i=0;i<this.sequence.size();i++){
-            Point current = this.sequence.get(i);
-            if(current.get_x()-size<0){
+          
+            if(this.sequence.get(i).get_x()-size<0){
                this.x_is_at_limits=true;
                break;
             }
@@ -365,16 +366,16 @@ class Object{
             //the first statement removes the limits that the object might have had hit  before
             this.xsize_is_at_limits =false;
         for(int i=0;i<this.sequence.size();i++){
-            Point current = this.sequence.get(i);
-            current.set_x(current.get_x()-size);
+           
+           this.sequence.get(i).set_x(this.sequence.get(i).get_x()-size);
             }
         }
     }
     public void translate_object_up(double size,double y_limits){
         
         for(int i=0;i<this.sequence.size();i++){
-            Point current = this.sequence.get(i);
-            if(current.get_y()+size>=y_limits){
+    
+            if(this.sequence.get(i).get_y()+size>=y_limits){
                this.ysize_is_at_limits=true;
                break;
             }
@@ -383,16 +384,16 @@ class Object{
             //the first statement removes the limits that the object might have had hit  before
             this.y_is_at_limits =false;
         for(int i=0;i<this.sequence.size();i++){
-            Point current = this.sequence.get(i);
-            current.set_y(current.get_y()+size);
+            
+            this.sequence.get(i).set_y(this.sequence.get(i).get_y()+size);
             }
         }
     }
     public void translate_object_down(double size){
         
         for(int i=0;i<this.sequence.size();i++){
-            Point current = this.sequence.get(i);
-            if(current.get_y()-size<0){
+            
+            if(this.sequence.get(i).get_y()-size<0){
                this.y_is_at_limits=true;
                break;
             }
@@ -401,8 +402,8 @@ class Object{
             //the first statement removes the limits that the object might have had hit  before
             this.ysize_is_at_limits =false;
         for(int i=0;i<this.sequence.size();i++){
-            Point current = this.sequence.get(i);
-            current.set_y(current.get_y()-size);
+           
+            this.sequence.get(i).set_y(this.sequence.get(i).get_y()-size);
             }
         }
     }
@@ -584,12 +585,12 @@ class Graph{
     //it will return an index to the function that is the best move;
     public int find_best_move(int object_id){
         if(this.objects_in_square.containsKey(object_id)){
-            Object current = this.objects_in_square.get(object_id);
+          
             //watch out for the min you might have to change it later
         double min =1000000;
         int i_min=0;
         for(int i=0;i<actions.size();i++){
-            double a = (Double)actions.get(i).apply(current);
+            double a = (Double)actions.get(i).apply(this.objects_in_square.get(object_id));
             if(a<=min){
                 min =a ;
                 i_min =i;
@@ -631,8 +632,8 @@ class Graph{
     }
     public void do_set_of_best_moves(int object_id){ 
         if(this.objects_in_square.containsKey(object_id)){
-            Object current = this.objects_in_square.get(object_id);
-            while(current.xlimits()==false&&current.ylimits()==false){
+            
+            while(this.objects_in_square.get(object_id).xlimits()==false&&this.objects_in_square.get(object_id).ylimits()==false){
                 this.do_best_move(object_id);
             }
             System.out.println("THE OBJECT IS IN PLACE CAPTAIN");
@@ -688,20 +689,38 @@ class Graph{
     public void add_object(Object o){
         /*this function will add the object to the graph ( the piece we are cutting on) 
         the ai algorithm will be applied inside this function on the object */
+        if(this.objects_in_square.keySet().size()==0){
+            //if the graph has no objects
         this.objects_in_square.put(o.get_Id(), o);
         for(int i=0;i<o.sequence.size();i++){
             // we first find the square which the points is in then we put it inside the square
             m.get(this.find_sq_point(o.sequence.get(i))).add_point(o.sequence.get(i));
             System.out.println("point added");
         }
+        }else{
+           
+            this.objects_in_square.put(o.get_Id(),o);
+            
         
+        }
 
+    }
+    public boolean check_collusion(Object current){
+        //Object current = this.objects_in_square.get(object_id);
+        for(int i=0;i<current.sequence.size();i++){
+            if(m.get(this.find_sq_point(current.sequence.get(i))).state()==false){
+                System.out.println("collusion");
+                return false;
+            };
+        }
+        System.out.println("no collusion");
+        return true;
     }
     public void remove_object(Object o){
         //this function removes the object that the add_object functions puts in the graph
         this.objects_in_square.remove(o.get_Id());
         for(int i=0;i<o.sequence.size();i++){
-            m.get(this.find_sq_point(o.sequence.get(i))).remove_point(o.sequence.get(i));
+            m.get(this.find_sq_point(o.sequence.get(i)));
             System.out.println("point removed");
         }
         
@@ -809,11 +828,11 @@ class Graph{
     public void translate_right(int object_id){
         //first check if the object is in the graph  
         if(this.objects_in_square.containsKey(object_id)){
-            Object current = this.objects_in_square.get(object_id);
-            if(current.xsizelimits()==false){
-            this.remove_object(current);
-            current.translate_object_right(this.square_size,this.x);
-            this.add_object(current);
+          
+            if(this.objects_in_square.get(object_id).xsizelimits()==false){
+            //this.remove_object(this.objects_in_square.get(object_id));
+           this.objects_in_square.get(object_id).translate_object_right(this.square_size,this.x);
+           // this.add_object(this.objects_in_square.get(object_id));
             }else{
                 System.out.println("current xsizelimits are true cant move object right ");
             }
@@ -824,11 +843,11 @@ class Graph{
     public void translate_left(int object_id){
         //first check if the object is in the graph  
         if(this.objects_in_square.containsKey(object_id)){
-            Object current = this.objects_in_square.get(object_id);
-            if(current.xlimits()==false){
-            this.remove_object(current);
-            current.translate_object_left(this.square_size);
-            this.add_object(current);
+            
+            if(this.objects_in_square.get(object_id).xlimits()==false){
+            //this.remove_object(this.objects_in_square.get(object_id));
+            this.objects_in_square.get(object_id).translate_object_left(this.square_size);
+            //this.add_object(this.objects_in_square.get(object_id));
             }else{
                 System.out.println("current xlimits are true cant move object left");
             }
@@ -839,12 +858,12 @@ class Graph{
     public void translate_up(int object_id){
         //first check if the object is in the graph  
         if(this.objects_in_square.containsKey(object_id)){
-            Object current = this.objects_in_square.get(object_id);
-            if(current.ysizelimits()==false){
+            
+            if(this.objects_in_square.get(object_id).ysizelimits()==false){
                 
-            this.remove_object(current);
-            current.translate_object_up(this.square_size,this.y);
-            this.add_object(current);
+            //this.remove_object(this.objects_in_square.get(object_id));
+            this.objects_in_square.get(object_id).translate_object_up(this.square_size,this.y);
+            //this.add_object(this.objects_in_square.get(object_id));
             }else{
                 System.out.println("current ysizelimits are true cant move object up ");
             }
@@ -855,11 +874,12 @@ class Graph{
     public void translate_down(int object_id){
         //first check if the object is in the graph  
         if(this.objects_in_square.containsKey(object_id)){
-            Object current = this.objects_in_square.get(object_id);
-            if(current.ylimits()==false){
-            this.remove_object(current);
-            current.translate_object_down(this.square_size);
-            this.add_object(current);
+            
+            if(this.objects_in_square.get(object_id).ylimits()==false){
+                System.out.println("test thissssssssssssssssss");
+            //this.remove_object(this.objects_in_square.get(object_id));
+            this.objects_in_square.get(object_id).translate_object_down(this.square_size);
+            //this.add_object(this.objects_in_square.get(object_id));
             }else{
                 System.out.println("current ylimits are true cant move object down ");
             }
