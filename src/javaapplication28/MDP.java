@@ -200,23 +200,23 @@ public class MDP {
  
  
         test_object2.info();
-        Point p3 = new Point(0,0,0);
+        Point p3 = new Point(27,3,0);
+        Point p4 = new Point(49,26,0);
+        test_object2.add_point(p4);
         test_object2.add_point(p3);
         test_object2.info();
         //g.translate_right(1);
-        g.objects_in_square.get(1).translate_object_up(g.square_size, g.y);
-        g.translate_down(1);
+        //g.objects_in_square.get(1).translate_object_up(g.square_size, g.y);
+        //g.translate_down(1);
         g.info();
-        g.translate_up(1);
-        g.translate_up(1);
-        g.translate_up(1);
-        g.translate_right(1);
-        g.translate_right(1);
-        g.do_set_of_best_moves(1);
-        g.info();
+        
+        g.add_object(test_object2);
         //System.out.println(g.find_best_move(1));
         
-        //g.check_collusion(test_object2);
+       // g.check_collusion(g.objects_in_square.get(2));
+        //g.info();
+        g.info();
+        
         
     }
     }
@@ -632,11 +632,20 @@ class Graph{
     }
     public void do_set_of_best_moves(int object_id){ 
         if(this.objects_in_square.containsKey(object_id)){
-            
+            if(this.objects_in_square.keySet().size()==0){
             while(this.objects_in_square.get(object_id).xlimits()==false&&this.objects_in_square.get(object_id).ylimits()==false){
                 this.do_best_move(object_id);
             }
             System.out.println("THE OBJECT IS IN PLACE CAPTAIN");
+            }
+            else{
+                //this function here moves the object according to the heuristic as long as there is no collusion
+                while(this.objects_in_square.get(object_id).xlimits()==false&&this.objects_in_square.get(object_id).ylimits()==false&&this.check_collusion(this.objects_in_square.get(object_id))){
+                this.do_best_move(object_id);
+            }
+            System.out.println("THE OBJECT IS IN PLACE CAPTAIN");
+            
+            }
             }else{
             System.out.println("OBJECT with id = "+object_id+" is not in the egraph");
         }
@@ -685,7 +694,7 @@ class Graph{
       }
     }
     
- 
+ //the complexity of add_object msibe 
     public void add_object(Object o){
         /*this function will add the object to the graph ( the piece we are cutting on) 
         the ai algorithm will be applied inside this function on the object */
@@ -697,24 +706,48 @@ class Graph{
             m.get(this.find_sq_point(o.sequence.get(i))).add_point(o.sequence.get(i));
             System.out.println("point added");
         }
+        this.do_set_of_best_moves(o.get_Id());
         }else{
            
             this.objects_in_square.put(o.get_Id(),o);
-            
+            o.info();
+            while(this.check_collusion(o)==true && o.xsizelimits()==false && o.ysizelimits()==false){
+                //if there is a collusion we keep translating the object up and to the right 
+                System.out.println("translate yayyy");
+                this.translate_up(o.get_Id());
+                this.translate_right(o.get_Id());
+            }
+            o.info();
+            if(this.check_collusion(o)==false){
+                System.out.println("eyooo");
+               for(int i=0;i<o.sequence.size();i++){
+                    // we first find the square which the points is in then we put it inside the square
+                     m.get(this.find_sq_point(o.sequence.get(i))).add_point(o.sequence.get(i));
+                     System.out.println("point added");
+            } 
+               o.info();
+               this.do_set_of_best_moves(o.get_Id());
+            }else{
+                   System.out.println("OBJECT CANNOT BE PLACED");
+            }
         
         }
 
     }
     public boolean check_collusion(Object current){
         //Object current = this.objects_in_square.get(object_id);
+        if(this.objects_in_square.keySet().size()==0){
+            // there is no collusion if only one object is in the graph
+            return false;
+        }
         for(int i=0;i<current.sequence.size();i++){
             if(m.get(this.find_sq_point(current.sequence.get(i))).state()==false){
                 System.out.println("collusion");
-                return false;
+                return true;
             };
         }
         System.out.println("no collusion");
-        return true;
+        return false;
     }
     public void remove_object(Object o){
         //this function removes the object that the add_object functions puts in the graph
