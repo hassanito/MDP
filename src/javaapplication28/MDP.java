@@ -184,52 +184,39 @@ public class MDP {
         test_object.add_point(test);
         test_object.add_point(test2);
         test_object.info();
-  
+        
         System.out.println("=================================================");
         Graph g = new Graph(100,100,2);
         g.add_object(test_object);
        
         g.info();
-        System.out.println("=================================================");
-       /* 
-        g.translate_up(1);
-        g.info();
-        g.translate_up(1);
-        g.info();
-        g.translate_up(1);
-        g.info();
-        g.translate_up(1);
-        g.info();
-        g.translate_up(1);
-        g.translate_down(1);
-        g.info();
-        g.translate_right(1);
-        g.info();
-        g.translate_right(1);
-        g.info();
-        g.translate_right(1);
-        g.info();
-        g.translate_right(1);
-        g.translate_up(1);
-        g.info();
-        g.translate_up(1);
-        g.translate_down(1);
-        g.translate_down(1);
-        g.translate_left(1);
-        g.translate_left(1);
-        g.translate_down(1);
-        g.info();
-        */
-        double a =g.up.apply(test_object);
+        System.out.println("xxxxxxxxxxxxx=================================================");
+  
         
-        double b = g.right.apply(test_object);
-        g.translate_right(1);
-        double c = g.right.apply(test_object);
-        System.out.println("==========================================");
         g.info();
-         System.out.println("b= "+b);
-         System.out.println("a= "+a);
-         System.out.println("c= "+c);
+        System.out.println(g.find_best_move(1));
+       
+    
+        
+        //g.translate_up(1);
+        //g.do_best_move(1);
+        //g.do_best_move(1);
+        //System.out.println("YEEEEHAWWWW");
+        //g.translate_right(1);
+        //g.do_best_move(1);
+        //g.do_best_move(1);
+        g.translate_right(1);
+        g.translate_right(1);
+        g.translate_up(1);
+        //g.do_best_move(1);
+        //g.do_best_move(1);
+        //g.do_best_move(1);
+        //g.do_best_move(1);
+        g.do_set_of_best_moves(1);
+        g.info();
+        
+        //System.out.println(g.find_best_move(1));
+        
     }
     }
     
@@ -527,27 +514,40 @@ class Graph{
     Function<Object, Double> up = (Object input) -> {
             this.translate_up(input.get_Id());
             double a =this.objects_in_square.get(input.get_Id()).heuristic();
-            this.translate_down(input.get_Id());
+            if(input.ysizelimits()==false){
+            this.translate_down(input.get_Id());}
+            System.out.println("up");
             return a;
         };
     Function<Object, Double> down = (Object input) -> {
+            
             this.translate_down(input.get_Id());
             double a =this.objects_in_square.get(input.get_Id()).heuristic();
+            if(input.ylimits()==false){
             this.translate_up(input.get_Id());
+            }
+            System.out.println("down");
             return a;
         };
         Function<Object, Double> right = (Object input) -> {
             this.translate_right(input.get_Id());
             double a =this.objects_in_square.get(input.get_Id()).heuristic();
-            this.translate_left(input.get_Id());
+            if(input.xsizelimits()==false){
+            this.translate_left(input.get_Id());}
+            System.out.println("right");
             return a;
         };
         Function<Object, Double> left = (Object input) -> {
             this.translate_left(input.get_Id());
             double a =this.objects_in_square.get(input.get_Id()).heuristic();
-            this.translate_right(input.get_Id());
+            if(input.xlimits()==false){
+            this.translate_right(input.get_Id());}
+            System.out.println("left");
             return a;
         };
+        
+    //this list will contain the actions of the AI ya3ne l functions tab3ul l translate
+    List<Function> actions = new ArrayList<Function>();
     double x;
     double y;
     double number_of_squares;
@@ -573,11 +573,73 @@ class Graph{
         square_size = Math.sqrt(square_area);
         fill_table();
         System.out.println("heyyaaa ");
-
-        
+        actions.add(up);
+        actions.add(down);
+        actions.add(left);
+        actions.add(right);
+       
     }
     // we only use the fill table function once
+    //thes function uses the test functions to find the move with the smalles heuristic.
+    //it will return an index to the function that is the best move;
+    public int find_best_move(int object_id){
+        if(this.objects_in_square.containsKey(object_id)){
+            Object current = this.objects_in_square.get(object_id);
+            //watch out for the min you might have to change it later
+        double min =1000000;
+        int i_min=0;
+        for(int i=0;i<actions.size();i++){
+            double a = (Double)actions.get(i).apply(current);
+            if(a<=min){
+                min =a ;
+                i_min =i;
+                System.out.println("min is = "+min);
+               
+            }
+                
+            }
+        return i_min;
+        }else{
+            System.out.println("OBJECT with id = "+object_id+" is not in the egraph");
+        }
+        return 0;
+        }
     
+    public void do_best_move(int object_id){
+    if(this.objects_in_square.containsKey(object_id)){
+            int index = this.find_best_move(object_id);
+            System.out.println("the index of the best move is ==================================================================  "+index );
+            switch (index){
+                case 0:
+                    this.translate_up(object_id);
+                    break;
+                case 1:
+                   
+                    this.translate_down(object_id);
+                    break;
+                case 2:
+                    this.translate_left(object_id);
+                    break;
+                case 3:
+                    this.translate_right(object_id);
+                    break;
+            }
+            System.out.println("best action applied");
+            }else{
+            System.out.println("OBJECT with id = "+object_id+" is not in the egraph");
+        }
+    }
+    public void do_set_of_best_moves(int object_id){ 
+        if(this.objects_in_square.containsKey(object_id)){
+            Object current = this.objects_in_square.get(object_id);
+            while(current.xlimits()==false&&current.ylimits()==false){
+                this.do_best_move(object_id);
+            }
+            System.out.println("THE OBJECT IS IN PLACE CAPTAIN");
+            }else{
+            System.out.println("OBJECT with id = "+object_id+" is not in the egraph");
+        }
+    }
     private void fill_table(){
         //function should create a list of squares
         // idea : take the x and y of the point and use it the multiple of x with the divider 
