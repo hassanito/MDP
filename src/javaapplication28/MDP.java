@@ -4,16 +4,20 @@
  * and open the template in the editor.
  */
 package javaapplication28;
+
 import java.util.*;
 import java.math.*;
 import java.util.function.Function;
+import java.awt.*;  
+import javax.swing.JFrame; 
+
 
 /**
  *
  * @author hassan
  */
 public class MDP {
-
+ 
     /**
      * @param args the command line arguments
      */
@@ -171,7 +175,7 @@ public class MDP {
         System.out.println("=========================================");
         g.translate_right(1);
         g.info();
-        */
+        
         System.out.println("test");
         Point test = new Point(26,2,3);
         //test.info();
@@ -186,7 +190,7 @@ public class MDP {
         test_object.info();
         
         System.out.println("=================================================");
-        Graph g = new Graph(100,100,2);
+        Graph g = new Graph(100,100,3);
         g.add_object(test_object);
        
         g.info();
@@ -216,7 +220,24 @@ public class MDP {
        // g.check_collusion(g.objects_in_square.get(2));
         //g.info();
         g.info();
+        */
+   
         
+        Graph g = new Graph(50,50,2);
+        g.info();
+        Point a = new Point(5,5,0);
+        Point b = new Point(27,27,0);
+        Point c = new Point(5,25,0);
+        Point d = new Point (25,5,0);
+        Object o1 = new Object();
+        o1.add_point(a);
+        o1.add_point(b);
+        o1.add_point(c);
+        o1.add_point(d);
+        System.out.println("====================================================");
+        o1.info();
+        g.add_object(o1);
+        g.info();
         
     }
     }
@@ -258,7 +279,7 @@ class Object{
     private static int object_Id_generator =0;
     private int object_Id ;
     
-    public List<Point> sequence;
+    public java.util.List<Point> sequence;
     public void add_point(Point a){
         a.set_Id(object_Id);
         sequence.add(a);
@@ -419,7 +440,7 @@ class Square{
     private double size;
     private double x_limits;
     private double y_limits;
-    public List<Point> points_in_square;
+    public java.util.List<Point> points_in_square;
     public Square(Point c,double s) {
         this.coordinates = c;
         this.size =s;
@@ -548,7 +569,7 @@ class Graph{
         };
         
     //this list will contain the actions of the AI ya3ne l functions tab3ul l translate
-    List<Function> actions = new ArrayList<Function>();
+    java.util.List<Function> actions = new java.util.ArrayList<Function>();
     double x;
     double y;
     double number_of_squares;
@@ -559,7 +580,8 @@ class Graph{
     //objects_in_Square stores the objects that are added to the graph and points to them using the mapping
     Map <Integer,Object> objects_in_square =  new HashMap<Integer,Object>();
     //squares_list contains the list of squares that form the graph
-    List <Square> squares_list = new ArrayList<Square>();
+    java.util.List <Square> squares_list = new ArrayList<Square>();
+    
     //m contains is a mapping fromt the coordinates to the squares 
     Map <String,Square > m = new HashMap<String,Square>();
     //the hashmap is a sorted table of all the squares in the graph to make it easy to find which squares do points belong to
