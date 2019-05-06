@@ -5,26 +5,103 @@
  */
 package javaapplication28;
 
+import java.awt.Color;
 import java.util.*;
 import java.math.*;
 import java.util.function.Function;
-import java.awt.*;  
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
+
+import javax.swing.JComponent;
 import javax.swing.JFrame; 
+
+class MyCanvas extends JComponent {
+  public void paint(Graphics gg) {
+      
+       Graph g = new Graph(500,500,5);
+        g.info();
+        Point a = new Point(100,100,0);
+        Point c = new Point(270,270,0);
+        Point d= new Point(50,250,0);
+        Point b = new Point (250,50,0);
+        Object o1 = new Object();
+        o1.add_point(a);
+        o1.add_point(b);
+        o1.add_point(c);
+        o1.add_point(d);
+        Object o2 = new Object();
+        Point batata = new Point(400,400,0);
+        Point batata2 = new Point(430,400,0);
+        Point batata3 = new Point(430,430,0);
+        Point batata4 = new Point(400,430,0);
+        o2.add_point(batata);
+        o2.add_point(batata2);
+        o2.add_point(batata3);
+        o2.add_point(batata4);
+        System.out.println("====================================================");
+        o1.info();
+        g.add_object(o1);
+        g.add_object(o2);
+        g.info();
+        System.out.println("====================================================");
+       
+       // g.remove_object(o1);
+    Graphics2D g2 = (Graphics2D) gg;
+    // draw a rectangle
+    
+    double leftX = 55.5;
+    double topY = 100;
+    double width = 200;
+    double height = 150;
+    
+    //Rectangle2D rect = new Rectangle2D.Double(leftX, topY, width, height);
+    
+//g2.draw(rect);
+    for(String i:g.m.keySet()){
+          /* System.out.println( "key = "+i);
+    
+           System.out.println("x= "+g.m.get(i).get_x());
+          
+           System.out.println("y = "+ g.m.get(i).get_y());
+           System.out.println("size = "+ g.m.get(i).get_square_size());
+          */
+           Rectangle2D rect = new Rectangle2D.Double(g.m.get(i).get_x(),g.m.get(i).get_y(), g.m.get(i).get_square_size(),  g.m.get(i).get_square_size());
+           if(g.m.get(i).state()==false){
+               g2.setColor(Color.RED);
+               g2.fill(rect);
+               g2.setColor(Color.black);
+           }else{
+           g2.draw(rect);
+           }
+        }
+     
+        System.out.println("bonnnnnnn");
+  }
+
+}
 
 
 /**
  *
  * @author hassan
  */
-public class MDP {
+public class MDP  {
  
     /**
      * @param args the command line arguments
      */
+    
     public static void main(String[] args) {
         // TODO code application logic here
+       JFrame window = new JFrame();
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.setBounds(30, 30, 500, 500);
+        window.getContentPane().add(new MyCanvas());
+        window.setVisible(true);
         
         System.out.println("bon");
+  
         /*Point a = new Point(23,56);
         a.info();
         System.out.println(a.get_x());
@@ -222,22 +299,12 @@ public class MDP {
         g.info();
         */
    
-        
-        Graph g = new Graph(50,50,2);
-        g.info();
-        Point a = new Point(5,5,0);
-        Point b = new Point(27,27,0);
-        Point c = new Point(5,25,0);
-        Point d = new Point (25,5,0);
-        Object o1 = new Object();
-        o1.add_point(a);
-        o1.add_point(b);
-        o1.add_point(c);
-        o1.add_point(d);
-        System.out.println("====================================================");
-        o1.info();
-        g.add_object(o1);
-        g.info();
+       
+        /*
+        System.out.println("the objects in this graph are : ");
+        for(int i:g.objects_in_square.keySet()){
+            g.objects_in_square.get(i).info();
+        }  */
         
     }
     }
@@ -247,13 +314,18 @@ public class MDP {
 class Point{
     private double x;
     private double y;
+    private boolean flag;
     //added the square id so every point will be recognized by the object it belongs to and vice versa
     private int square_Id=0;
     public Point(double x,double y,int sq_id){
         this.x =x;
         this.y =y;
+        this.flag =false;
         square_Id = sq_id;
         
+    }
+    public void set_flag(boolean v){
+        this.flag =v;
     }
     public int get_Id(){return square_Id;}
     public void set_Id(int Id){this.square_Id= Id;}
@@ -262,6 +334,9 @@ class Point{
     }
     public double get_y(){
         return y;
+    }
+    public boolean get_flag(){
+        return flag;
     }
     public void set_x(double x){
         this.x= x;
@@ -278,7 +353,7 @@ class Object{
     //an object is a sequence of points
     private static int object_Id_generator =0;
     private int object_Id ;
-    
+    Graph g;
     public java.util.List<Point> sequence;
     public void add_point(Point a){
         a.set_Id(object_Id);
@@ -290,7 +365,7 @@ class Object{
     private boolean y_is_at_limits;
     private boolean xsize_is_at_limits;
     private boolean ysize_is_at_limits;
-    
+    public java.util.List <Point> boundaries;
     public Object(){
         sequence  = new ArrayList<Point>();
         object_Id_generator++;
@@ -358,12 +433,8 @@ class Object{
         for(int i=0;i<this.sequence.size();i++){
             
             
-            //checks if the point is bigger than the limits - I should add something that stops this in the future
-            if(this.sequence.get(i).get_x()+size<=x_limits){
-               // current.set_x(current.get_x()+size);
-            }else{
-                this.xsize_is_at_limits = true;
-                System.out.println("error this point is over the limit");
+            if(this.sequence.get(i).get_x()+size>=x_limits){
+                this.xsize_is_at_limits =true;
                 break;
             }
         }
@@ -371,8 +442,17 @@ class Object{
             //the first statement removes the limits that the object might have had hit  before
             this.x_is_at_limits =false;
             for(int i=0;i<this.sequence.size();i++){
-               
-                this.sequence.get(i).set_x(this.sequence.get(i).get_x()+size);            }
+               // the sq finds the square of this point
+            String sq = g.find_sq_point(this.sequence.get(i));
+           // this line removes the point from the square
+            g.m.get(sq).remove_point(this.sequence.get(i));
+            this.sequence.get(i).set_x(this.sequence.get(i).get_x()+size);     
+            // the sq finds the square of this point
+            String sq2 = g.find_sq_point(this.sequence.get(i));
+           // this line removes the point from the square
+            g.m.get(sq2).add_point(this.sequence.get(i));
+            }
+    
         }
     }
     public void translate_object_left(double size){
@@ -387,9 +467,16 @@ class Object{
             //the first statement removes the limits that the object might have had hit  before
             this.xsize_is_at_limits =false;
         for(int i=0;i<this.sequence.size();i++){
-           
+           // the sq finds the square of this point
+            String sq = g.find_sq_point(this.sequence.get(i));
+           // this line removes the point from the square
+            g.m.get(sq).remove_point(this.sequence.get(i));
            this.sequence.get(i).set_x(this.sequence.get(i).get_x()-size);
-            }
+           // the sq finds the square of this point
+            String sq2 = g.find_sq_point(this.sequence.get(i));
+           // this line removes the point from the square
+            g.m.get(sq2).add_point(this.sequence.get(i));
+        }
         }
     }
     public void translate_object_up(double size,double y_limits){
@@ -405,8 +492,14 @@ class Object{
             //the first statement removes the limits that the object might have had hit  before
             this.y_is_at_limits =false;
         for(int i=0;i<this.sequence.size();i++){
-            
+            // the sq finds the square of this point
+            String sq = g.find_sq_point(this.sequence.get(i));
+           // this line removes the point from the square
+            g.m.get(sq).remove_point(this.sequence.get(i));
             this.sequence.get(i).set_y(this.sequence.get(i).get_y()+size);
+            //over here we add the point to the new square
+            String sq2 = g.find_sq_point(this.sequence.get(i));
+            g.m.get(sq2).add_point(this.sequence.get(i));
             }
         }
     }
@@ -423,12 +516,77 @@ class Object{
             //the first statement removes the limits that the object might have had hit  before
             this.ysize_is_at_limits =false;
         for(int i=0;i<this.sequence.size();i++){
-           
+           // the sq finds the square of this point
+            String sq = g.find_sq_point(this.sequence.get(i));
+           // this line removes the point from the square
+            g.m.get(sq).remove_point(this.sequence.get(i));
             this.sequence.get(i).set_y(this.sequence.get(i).get_y()-size);
-            }
+            // the sq finds the square of this point
+            String sq2 = g.find_sq_point(this.sequence.get(i));
+           // this line removes the point from the square
+            g.m.get(sq2).add_point(this.sequence.get(i));
+        }
         }
     }
-    
+    //this function finds the boundaries points between 2 points    
+    public java.util.List<Point> find_boundaries(Point a,Point b){
+        java.util.List<Point> bound= new ArrayList<Point>();
+        double slope=0;
+     
+        slope = (b.get_y()- a.get_y())/(b.get_x()-a.get_x());
+        if(a.get_x()<b.get_x()){
+        for(int i=0;i<g.xvar.size();i++){
+            double v = g.xvar.get(i);
+            double c=0;
+            if(v>=a.get_x() && v<= b.get_x()){
+                c = slope *(v-a.get_x()) +a.get_y();
+                Point p = new Point(v,c,0);
+                p.set_flag(true);
+                bound.add(p);
+                this.add_point(p);
+                p.info();
+            }
+        }}else{
+        for(int i=0;i<g.xvar.size();i++){
+            double v = g.xvar.get(i);
+            double c=0;
+            if(v<=a.get_x() && v>= b.get_x()){
+                c = slope *(v-a.get_x()) +a.get_y();
+                Point p = new Point(v,c,0);
+                bound.add(p);
+                this.add_point(p);
+                p.info();
+            }
+        }
+        }
+        if(a.get_y()<b.get_y()){
+        for(int i=0;i<g.yvar.size();i++){
+            double v = g.yvar.get(i);
+            double c=0;
+            if(v>=a.get_y() && v<= b.get_y()){
+                c = (1/slope) *(v-a.get_y()) +a.get_x();
+                Point p = new Point(c,v,0);
+                bound.add(p);
+                this.add_point(p);
+                p.info();
+            }
+        }}else{
+        
+        for(int i=0;i<g.yvar.size();i++){
+            double v = g.yvar.get(i);
+            double c=0;
+            if(v<=a.get_y() && v>= b.get_y()){
+                c = (1/slope) *(v-a.get_y()) +a.get_x();
+                Point p = new Point(c,v,0);
+                bound.add(p);
+                this.add_point(p);
+                p.info();
+            }
+        }
+        }
+        
+        return bound;
+    }
 }
 class Square{
     // maybe I should do something to check that no 2 squares at the same point should exist
@@ -440,6 +598,8 @@ class Square{
     private double size;
     private double x_limits;
     private double y_limits;
+    public double id_x;
+    public double id_y;
     public java.util.List<Point> points_in_square;
     public Square(Point c,double s) {
         this.coordinates = c;
@@ -447,7 +607,11 @@ class Square{
         empty = true;
         ID_counter++;
         ID=ID_counter; 
+        double id_x = coordinates.get_x();
+        double id_y =coordinates.get_y();
         id_coor = coordinates.get_x() +"-"+coordinates.get_y();
+        
+        
         // ID counter is static (class related) so it keeps increasing with every object square we create
         // ID is object related so every object created will have a value;
         x_limits = c.get_x()+size;
@@ -456,6 +620,9 @@ class Square{
        // System.out.println("the id of this square is = "+ID);
         
     }
+    public double get_square_size(){
+        return this.size;
+       }
     public void set_empty(boolean state){
         empty = state;
     }
@@ -481,6 +648,7 @@ class Square{
     public int get_ID(){
         return ID;
     }
+
     public double get_x(){return coordinates.get_x();}
     public double get_y(){return coordinates.get_y();}
     public void add_point(Point a){
@@ -587,6 +755,10 @@ class Graph{
     //the hashmap is a sorted table of all the squares in the graph to make it easy to find which squares do points belong to
     //  Map <Double,List<List<Double>>> entry2 = new HashMap<Double,List<List<Double>>>();
     Double[] arr;
+    //xvar and yvar lists contain the x and y of that divide the grid 
+    java.util.List <Double> xvar = new ArrayList<Double>();
+    java.util.List <Double> yvar = new ArrayList<Double>();
+
     public Graph(double x,double y,int n){
         this.x =x;
         this.y = y;
@@ -677,9 +849,13 @@ class Graph{
         // idea : take the x and y of the point and use it the multiple of x with the divider 
         int counter =0;
         for(int i=0;i<x/square_size;i++){
+             xvar.add(i*square_size);
+             yvar.add(i*square_size);
             for(int j=0;j<y/square_size;j++){
                                 
                 Square a = new Square(new Point(i*square_size,j*square_size,0),square_size);
+                
+               
                 squares_list.add(a);
                 
                 m.put(a.get_id_coor(),a);
@@ -720,19 +896,48 @@ class Graph{
     public void add_object(Object o){
         /*this function will add the object to the graph ( the piece we are cutting on) 
         the ai algorithm will be applied inside this function on the object */
+        //o.g makes adds this graph as an attribute so we can do functions over it
+        o.g = this;
         if(this.objects_in_square.keySet().size()==0){
             //if the graph has no objects
         this.objects_in_square.put(o.get_Id(), o);
+           
+         for(int i=0;i<o.sequence.size()-1;i++){
+            if(o.sequence.get(i).get_flag()==true){
+                break;
+            }    
+            o.find_boundaries(o.sequence.get(i), o.sequence.get(i+1));
+           
+        }
         for(int i=0;i<o.sequence.size();i++){
             // we first find the square which the points is in then we put it inside the square
             m.get(this.find_sq_point(o.sequence.get(i))).add_point(o.sequence.get(i));
+            
+            
+            
             System.out.println("point added");
         }
-        this.do_set_of_best_moves(o.get_Id());
+        // the fact that if a point is bigger than the other might be a problem
+        
+       
+       
+     
+
+
+
+        // I should add this later when it works
+             this.do_set_of_best_moves(o.get_Id());
         }else{
            
             this.objects_in_square.put(o.get_Id(),o);
             o.info();
+            for(int i=0;i<o.sequence.size()-1;i++){
+            if(o.sequence.get(i).get_flag()==true){
+                break;
+            }    
+            o.find_boundaries(o.sequence.get(i), o.sequence.get(i+1));
+           
+        }
             while(this.check_collusion(o)==true && o.xsizelimits()==false && o.ysizelimits()==false){
                 //if there is a collusion we keep translating the object up and to the right 
                 System.out.println("translate yayyy");
@@ -775,9 +980,12 @@ class Graph{
         //this function removes the object that the add_object functions puts in the graph
         this.objects_in_square.remove(o.get_Id());
         for(int i=0;i<o.sequence.size();i++){
-            m.get(this.find_sq_point(o.sequence.get(i)));
+            // the thing is you should remove the points from the squares too
+            String sq = this.find_sq_point(o.sequence.get(i));
+            m.get(sq).remove_point(o.sequence.get(i));
             System.out.println("point removed");
         }
+        
         
     }
     // Returns element closest to target in arr[] 
@@ -858,7 +1066,7 @@ class Graph{
     }
  
 
-    public String find_sq_point(Point a){
+    public  String find_sq_point(Point a){
         //this function find the string id of the point a
         double a1 = a.get_x();
         a1 = a1-a1%this.square_size;
@@ -911,6 +1119,7 @@ class Graph{
         }
     }
     public void translate_up(int object_id){
+        System.out.println("WE TRANSLATED THE OBJECT UP");
         //first check if the object is in the graph  
         if(this.objects_in_square.containsKey(object_id)){
             
