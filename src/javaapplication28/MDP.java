@@ -19,32 +19,41 @@ import javax.swing.JFrame;
 class MyCanvas extends JComponent {
   public void paint(Graphics gg) {
       
-       Graph g = new Graph(500,500,5);
-        g.info();
+       Graph g = new Graph(500,500,2);
+      //  g.info();
         Point a = new Point(100,100,0);
-        Point c = new Point(270,270,0);
-        Point d= new Point(50,250,0);
-        Point b = new Point (250,50,0);
+        //Point c = new Point(270,270,0);
+        //Point d= new Point(50,250,0);
+        //Point b = new Point (250,50,0);
         Object o1 = new Object();
         o1.add_point(a);
-        o1.add_point(b);
-        o1.add_point(c);
-        o1.add_point(d);
+        //o1.add_point(b);
+        //o1.add_point(c);
+        //o1.add_point(d);
         Object o2 = new Object();
         Point batata = new Point(400,400,0);
-        Point batata2 = new Point(430,400,0);
-        Point batata3 = new Point(430,430,0);
-        Point batata4 = new Point(400,430,0);
+        //Point batata2 = new Point(450,400,0);
+        //Point batata3 = new Point(490,490,0);
+        //Point batata4 = new Point(400,490,0);
         o2.add_point(batata);
-        o2.add_point(batata2);
-        o2.add_point(batata3);
-        o2.add_point(batata4);
+        //o2.add_point(batata2);
+        //o2.add_point(batata3);
+        //o2.add_point(batata4);
         System.out.println("====================================================");
-        o1.info();
+        //o1.min ();
         g.add_object(o1);
         g.add_object(o2);
+        //g.info();
         g.info();
+        
+  
+        g.info();
+        //g.translate_left(2);
+        System.out.println("YEEEEEEEEEEEEEEEEEEEEHAWWWWWWWWWWWWWWWWWWWWWWWWWW");
+
+        // g.object_collusion(o2);
         System.out.println("====================================================");
+        g.info();
        
        // g.remove_object(o1);
     Graphics2D g2 = (Graphics2D) gg;
@@ -67,7 +76,7 @@ class MyCanvas extends JComponent {
            System.out.println("size = "+ g.m.get(i).get_square_size());
           */
            Rectangle2D rect = new Rectangle2D.Double(g.m.get(i).get_x(),g.m.get(i).get_y(), g.m.get(i).get_square_size(),  g.m.get(i).get_square_size());
-           if(g.m.get(i).state()==false){
+           if(g.m.get(i).is_empty()==false){
                g2.setColor(Color.RED);
                g2.fill(rect);
                g2.setColor(Color.black);
@@ -354,6 +363,7 @@ class Object{
     private static int object_Id_generator =0;
     private int object_Id ;
     Graph g;
+    public boolean collusion;
     public java.util.List<Point> sequence;
     public void add_point(Point a){
         a.set_Id(object_Id);
@@ -374,6 +384,7 @@ class Object{
         y_is_at_limits=false;
         xsize_is_at_limits=false;
         ysize_is_at_limits=false;
+        this.collusion = false;
     }
     public double x_heuristic(){
         double h_x=0;
@@ -415,6 +426,7 @@ class Object{
     }
     public void info(){
         System.out.println("the object id is = "+object_Id);
+        System.out.println("COLLUSION= "+this.collusion);
         for(int i=0;i<sequence.size();i++){
             sequence.get(i).info();
         }
@@ -451,6 +463,13 @@ class Object{
             String sq2 = g.find_sq_point(this.sequence.get(i));
            // this line removes the point from the square
             g.m.get(sq2).add_point(this.sequence.get(i));
+            //finds collusion
+            if(g.m.get(sq2).sq_collusion==true){
+                                System.out.println("collusion!! Donald trump does not approves this message ");
+
+                this.collusion = true;
+                g.m.get(sq2).sq_collusion=false;
+            }
             }
     
         }
@@ -476,6 +495,12 @@ class Object{
             String sq2 = g.find_sq_point(this.sequence.get(i));
            // this line removes the point from the square
             g.m.get(sq2).add_point(this.sequence.get(i));
+           //finds collusions 
+           if(g.m.get(sq2).sq_collusion==true){
+                this.collusion = true;
+                System.out.println("collusion!! Donald trump does not approves this message ");
+                g.m.get(sq2).sq_collusion=false;
+            }
         }
         }
     }
@@ -487,6 +512,7 @@ class Object{
                this.ysize_is_at_limits=true;
                break;
             }
+            
         }
         if(this.ysize_is_at_limits==false){
             //the first statement removes the limits that the object might have had hit  before
@@ -500,6 +526,11 @@ class Object{
             //over here we add the point to the new square
             String sq2 = g.find_sq_point(this.sequence.get(i));
             g.m.get(sq2).add_point(this.sequence.get(i));
+            if(g.m.get(sq2).sq_collusion==true){
+                System.out.println("collusion!! Donald trump does not approves this message ");
+                this.collusion = true;
+                g.m.get(sq2).sq_collusion=false;
+            }
             }
         }
     }
@@ -525,6 +556,12 @@ class Object{
             String sq2 = g.find_sq_point(this.sequence.get(i));
            // this line removes the point from the square
             g.m.get(sq2).add_point(this.sequence.get(i));
+            if(g.m.get(sq2).sq_collusion==true){
+                                System.out.println("collusion!! Donald trump does not approves this message ");
+
+                this.collusion = true;
+                g.m.get(sq2).sq_collusion=false;
+            }
         }
         }
     }
@@ -544,7 +581,7 @@ class Object{
                 p.set_flag(true);
                 bound.add(p);
                 this.add_point(p);
-                p.info();
+                //p.info();
             }
         }}else{
         for(int i=0;i<g.xvar.size();i++){
@@ -555,7 +592,7 @@ class Object{
                 Point p = new Point(v,c,0);
                 bound.add(p);
                 this.add_point(p);
-                p.info();
+                //p.info();
             }
         }
         }
@@ -568,7 +605,7 @@ class Object{
                 Point p = new Point(c,v,0);
                 bound.add(p);
                 this.add_point(p);
-                p.info();
+               // p.info();
             }
         }}else{
         
@@ -580,7 +617,7 @@ class Object{
                 Point p = new Point(c,v,0);
                 bound.add(p);
                 this.add_point(p);
-                p.info();
+              //  p.info();
             }
         }
         }
@@ -600,7 +637,9 @@ class Square{
     private double y_limits;
     public double id_x;
     public double id_y;
+    private int object_id;
     public java.util.List<Point> points_in_square;
+    public boolean sq_collusion;
     public Square(Point c,double s) {
         this.coordinates = c;
         this.size =s;
@@ -610,7 +649,9 @@ class Square{
         double id_x = coordinates.get_x();
         double id_y =coordinates.get_y();
         id_coor = coordinates.get_x() +"-"+coordinates.get_y();
-        
+        object_id =0;
+        sq_collusion = false;
+         
         
         // ID counter is static (class related) so it keeps increasing with every object square we create
         // ID is object related so every object created will have a value;
@@ -620,13 +661,19 @@ class Square{
        // System.out.println("the id of this square is = "+ID);
         
     }
+    public void set_object_id(int id){
+        this.object_id = id;
+    }
+    public int get_object_id(){
+        return this.object_id;
+    }
     public double get_square_size(){
         return this.size;
        }
     public void set_empty(boolean state){
         empty = state;
     }
-    public boolean state(){
+    public boolean is_empty(){
         return empty;
     }
     public double get_x_limits(){
@@ -656,20 +703,28 @@ class Square{
         /* not sure if I should check (the contains point function) if the point belongs to this square in this function or in the graph
         and might deprecate it later */
         if(this.contains_point(a)){
+            if(this.points_in_square.size()>=1&& this.get_object_id()!= a.get_Id()){
+                this.sq_collusion = true;}
+           
             points_in_square.add(a);
-             this.set_empty(false);
+            this.object_id = a.get_Id();
+            this.set_empty(false);
        } else{
-            System.out.println("point does not belong to square");
+            throw new IllegalStateException("add_point: Should not get here!!!");
+
         }
 }
     public void remove_point(Point a){
         //this function removes a point from a square and if the square has no points left it will become empty
         if(points_in_square.contains(a)){
-            System.out.println("yes it does ya hmar");
+            //System.out.println("yes it does ya hmar");
             points_in_square.remove(a);
             
+        } else {
+            throw new IllegalStateException("remove_point: Should not get here!!!");
         }
         if(points_in_square.isEmpty()){
+            this.object_id =0;
             this.set_empty(true);
         }
     }
@@ -678,6 +733,7 @@ class Square{
     public void info(){
         System.out.print("square COOR "+id_coor+" with an id = "+ID+" of size = "+ size +" and coordinates ");
         coordinates.info();
+        System.out.println("COLLUSION IN SQUARE IS = "+this.sq_collusion);
         if(empty==true ){
             System.out.println(" is empty ");
         }else{
@@ -706,7 +762,7 @@ class Graph{
             double a =this.objects_in_square.get(input.get_Id()).heuristic();
             if(input.ysizelimits()==false){
             this.translate_down(input.get_Id());}
-            System.out.println("up");
+            //System.out.println("up");
             return a;
         };
     Function<Object, Double> down = (Object input) -> {
@@ -716,7 +772,7 @@ class Graph{
             if(input.ylimits()==false){
             this.translate_up(input.get_Id());
             }
-            System.out.println("down");
+            //System.out.println("down");
             return a;
         };
         Function<Object, Double> right = (Object input) -> {
@@ -724,7 +780,7 @@ class Graph{
             double a =this.objects_in_square.get(input.get_Id()).heuristic();
             if(input.xsizelimits()==false){
             this.translate_left(input.get_Id());}
-            System.out.println("right");
+            //System.out.println("right");
             return a;
         };
         Function<Object, Double> left = (Object input) -> {
@@ -732,12 +788,12 @@ class Graph{
             double a =this.objects_in_square.get(input.get_Id()).heuristic();
             if(input.xlimits()==false){
             this.translate_right(input.get_Id());}
-            System.out.println("left");
+            //System.out.println("left");
             return a;
         };
         
     //this list will contain the actions of the AI ya3ne l functions tab3ul l translate
-    java.util.List<Function> actions = new java.util.ArrayList<Function>();
+    java.util.List<Function<Object, Double>> actions = new java.util.ArrayList<>();
     double x;
     double y;
     double number_of_squares;
@@ -784,11 +840,11 @@ class Graph{
         double min =1000000;
         int i_min=0;
         for(int i=0;i<actions.size();i++){
-            double a = (Double)actions.get(i).apply(this.objects_in_square.get(object_id));
+            double a = actions.get(i).apply(this.objects_in_square.get(object_id));
             if(a<=min){
                 min =a ;
                 i_min =i;
-                System.out.println("min is = "+min);
+                //System.out.println("min is = "+min);
                
             }
                 
@@ -803,7 +859,7 @@ class Graph{
     public void do_best_move(int object_id){
     if(this.objects_in_square.containsKey(object_id)){
             int index = this.find_best_move(object_id);
-            System.out.println("the index of the best move is ==================================================================  "+index );
+          //  System.out.println("the index of the best move is ==================================================================  "+index );
             switch (index){
                 case 0:
                     this.translate_up(object_id);
@@ -819,30 +875,60 @@ class Graph{
                     this.translate_right(object_id);
                     break;
             }
-            System.out.println("best action applied");
+            //System.out.println("best action applied");
             }else{
             System.out.println("OBJECT with id = "+object_id+" is not in the egraph");
         }
     }
     public void do_set_of_best_moves(int object_id){ 
+        
+        
+        if(this.objects_in_square.keySet().size()==1){
+              double old=1;
+              double nouv=0;
+              int i=0;
+              //this while lop is a permenant fix
+              System.out.println("we are entering the loop");
+              // this is the non classical search function
+              while(nouv<old){
+                  old= this.objects_in_square.get(object_id).heuristic();
+                  this.do_best_move(object_id);
+                  nouv = this.objects_in_square.get(object_id).heuristic();
+                  //System.out.println("old = "+old);
+                  //System.out.println("nouv = "+nouv);
+
+                  i++;
+              }
+            /*while(this.objects_in_square.get(object_id).xlimits()==false
+                    &&this.objects_in_square.get(object_id).ylimits()==false){
+
+            this.do_best_move(object_id);
+            } */    
+        }else{
+          
+            //while(this.object_collusion(this.objects_in_square.get(object_id))==false){
+              // this.do_best_move(object_id);
+           // } 
+        /*
         if(this.objects_in_square.containsKey(object_id)){
             if(this.objects_in_square.keySet().size()==0){
-            while(this.objects_in_square.get(object_id).xlimits()==false&&this.objects_in_square.get(object_id).ylimits()==false){
+            while(this.object_collusion(this.objects_in_square.get(object_id))==false){
                 this.do_best_move(object_id);
             }
             System.out.println("THE OBJECT IS IN PLACE CAPTAIN");
             }
             else{
                 //this function here moves the object according to the heuristic as long as there is no collusion
-                while(this.objects_in_square.get(object_id).xlimits()==false&&this.objects_in_square.get(object_id).ylimits()==false&&this.check_collusion(this.objects_in_square.get(object_id))){
-                this.do_best_move(object_id);
+                while(this.objects_in_square.get(object_id).xlimits()==false&&this.objects_in_square.get(object_id).ylimits()==false){
+                    this.do_best_move(object_id);
             }
             System.out.println("THE OBJECT IS IN PLACE CAPTAIN");
             
             }
             }else{
             System.out.println("OBJECT with id = "+object_id+" is not in the egraph");
-        }
+        }*/
+    }
     }
     private void fill_table(){
         //function should create a list of squares
@@ -901,7 +987,7 @@ class Graph{
         if(this.objects_in_square.keySet().size()==0){
             //if the graph has no objects
         this.objects_in_square.put(o.get_Id(), o);
-           
+        
          for(int i=0;i<o.sequence.size()-1;i++){
             if(o.sequence.get(i).get_flag()==true){
                 break;
@@ -909,28 +995,24 @@ class Graph{
             o.find_boundaries(o.sequence.get(i), o.sequence.get(i+1));
            
         }
+         
         for(int i=0;i<o.sequence.size();i++){
             // we first find the square which the points is in then we put it inside the square
+            
             m.get(this.find_sq_point(o.sequence.get(i))).add_point(o.sequence.get(i));
             
             
             
-            System.out.println("point added");
+        //    System.out.println("point added");
         }
         // the fact that if a point is bigger than the other might be a problem
-        
-       
-       
-     
-
-
-
         // I should add this later when it works
-             this.do_set_of_best_moves(o.get_Id());
+        this.do_set_of_best_moves(o.get_Id());
         }else{
-           
+            
+            // we add the object to the square
             this.objects_in_square.put(o.get_Id(),o);
-            o.info();
+            //we find the boundaries of the object 
             for(int i=0;i<o.sequence.size()-1;i++){
             if(o.sequence.get(i).get_flag()==true){
                 break;
@@ -938,43 +1020,44 @@ class Graph{
             o.find_boundaries(o.sequence.get(i), o.sequence.get(i+1));
            
         }
-            while(this.check_collusion(o)==true && o.xsizelimits()==false && o.ysizelimits()==false){
+            for(int i=0;i<o.sequence.size();i++){
+                    // we first find the square which the points is in then we put it inside the square
+                     m.get(this.find_sq_point(o.sequence.get(i))).add_point(o.sequence.get(i));
+             //        System.out.println("point added");
+            }
+            while( o.xsizelimits()==false && o.ysizelimits()==false){
                 //if there is a collusion we keep translating the object up and to the right 
                 System.out.println("translate yayyy");
                 this.translate_up(o.get_Id());
                 this.translate_right(o.get_Id());
             }
-            o.info();
-            if(this.check_collusion(o)==false){
-                System.out.println("eyooo");
-               for(int i=0;i<o.sequence.size();i++){
-                    // we first find the square which the points is in then we put it inside the square
-                     m.get(this.find_sq_point(o.sequence.get(i))).add_point(o.sequence.get(i));
-                     System.out.println("point added");
-            } 
-               o.info();
-               this.do_set_of_best_moves(o.get_Id());
-            }else{
-                   System.out.println("OBJECT CANNOT BE PLACED");
-            }
-        
+            
+            if(o.xsizelimits()==true || o.ysizelimits()==true ||o.xlimits()==true || o.ylimits()==true){
+                this.do_set_of_best_moves(o.get_Id());
+            };
+          
         }
 
     }
-    public boolean check_collusion(Object current){
+    public boolean object_collusion(Object current){
         //Object current = this.objects_in_square.get(object_id);
-        if(this.objects_in_square.keySet().size()==0){
+        if(this.objects_in_square.keySet().isEmpty()==true){
             // there is no collusion if only one object is in the graph
             return false;
         }
         for(int i=0;i<current.sequence.size();i++){
-            if(m.get(this.find_sq_point(current.sequence.get(i))).state()==false){
+            if(m.get(this.find_sq_point(current.sequence.get(i))).get_object_id()!= current.sequence.get(i).get_Id()){
+                System.out.println("object id= "+m.get(this.find_sq_point(current.sequence.get(i))).get_object_id());
+                System.out.println(current.sequence.get(i).get_Id());
                 System.out.println("collusion");
-                return true;
+                // throw new IllegalStateException("OBJECT with id = "+object_id+" is not in the egraph");
+                 //ntebeh hon
+                 return true;
             };
         }
         System.out.println("no collusion");
         return false;
+        // if we have a collusion we return true otherwise we return true
     }
     public void remove_object(Object o){
         //this function removes the object that the add_object functions puts in the graph
@@ -983,7 +1066,7 @@ class Graph{
             // the thing is you should remove the points from the squares too
             String sq = this.find_sq_point(o.sequence.get(i));
             m.get(sq).remove_point(o.sequence.get(i));
-            System.out.println("point removed");
+          //  System.out.println("point removed");
         }
         
         
@@ -1096,8 +1179,12 @@ class Graph{
             //this.remove_object(this.objects_in_square.get(object_id));
            this.objects_in_square.get(object_id).translate_object_right(this.square_size,this.x);
            // this.add_object(this.objects_in_square.get(object_id));
+            if(this.objects_in_square.get(object_id).collusion==true){
+                this.objects_in_square.get(object_id).collusion=false;
+                this.translate_left(object_id);
+            }
             }else{
-                System.out.println("current xsizelimits are true cant move object right ");
+               // System.out.println("current xsizelimits are true cant move object right ");
             }
         }else{
             System.out.println("OBJECT with id = "+object_id+" is not in the egraph");
@@ -1111,28 +1198,41 @@ class Graph{
             //this.remove_object(this.objects_in_square.get(object_id));
             this.objects_in_square.get(object_id).translate_object_left(this.square_size);
             //this.add_object(this.objects_in_square.get(object_id));
+            if(this.objects_in_square.get(object_id).collusion==true){
+                                this.objects_in_square.get(object_id).collusion=false;
+
+                this.translate_right(object_id);
+                
+            }
             }else{
-                System.out.println("current xlimits are true cant move object left");
+                //System.out.println("current xlimits are true cant move object left");
             }
         }else{
             System.out.println("OBJECT with id = "+object_id+" is not in the egraph");
         }
     }
     public void translate_up(int object_id){
-        System.out.println("WE TRANSLATED THE OBJECT UP");
+       // System.out.println("WE TRANSLATED THE OBJECT UP");
         //first check if the object is in the graph  
         if(this.objects_in_square.containsKey(object_id)){
             
-            if(this.objects_in_square.get(object_id).ysizelimits()==false){
+            if(this.objects_in_square.get(object_id).ysizelimits()==false ){
                 
             //this.remove_object(this.objects_in_square.get(object_id));
             this.objects_in_square.get(object_id).translate_object_up(this.square_size,this.y);
             //this.add_object(this.objects_in_square.get(object_id));
+            if(this.objects_in_square.get(object_id).collusion==true){
+            this.objects_in_square.get(object_id).collusion=false;
+            this.translate_down(object_id);
+            
+            }
             }else{
-                System.out.println("current ysizelimits are true cant move object up ");
+                //System.out.println("current ysizelimits are true cant move object up ");
             }
         }else{
             System.out.println("OBJECT with id = "+object_id+" is not in the egraph");
+           throw new IllegalStateException("OBJECT with id = "+object_id+" is not in the egraph");
+
         }
     }
     public void translate_down(int object_id){
@@ -1140,15 +1240,19 @@ class Graph{
         if(this.objects_in_square.containsKey(object_id)){
             
             if(this.objects_in_square.get(object_id).ylimits()==false){
-                System.out.println("test thissssssssssssssssss");
+               // System.out.println("test thissssssssssssssssss");
             //this.remove_object(this.objects_in_square.get(object_id));
             this.objects_in_square.get(object_id).translate_object_down(this.square_size);
             //this.add_object(this.objects_in_square.get(object_id));
+            if(this.objects_in_square.get(object_id).collusion==true){
+                this.objects_in_square.get(object_id).collusion=false;
+                this.translate_up(object_id);
+            }
             }else{
-                System.out.println("current ylimits are true cant move object down ");
+                //System.out.println("current ylimits are true cant move object down ");
             }
         }else{
-            System.out.println("OBJECT with id = "+object_id+" is not in the egraph");
+           // System.out.println("OBJECT with id = "+object_id+" is not in the egraph");
         }
     }
     
