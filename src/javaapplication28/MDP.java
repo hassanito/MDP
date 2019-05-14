@@ -19,75 +19,55 @@ import javax.swing.JFrame;
 class MyCanvas extends JComponent {
   public void paint(Graphics gg) {
       
-       Graph g = new Graph(500,500,7);
-       Point a1 = new Point(100,100,0);
-       Point a2 = new Point(200,100,0);
-       Point a3 = new Point(250,200,0);
-       Point a4 = new Point(100,200,0);
+       Graph g = new Graph(500,500,8);
+     
+       Point a1 = new Point(200,200,0);
+       Point a2 = new Point(250,200,0);
+       Point a3 = new Point(270,300,0);
+       Point a4 = new Point(230,300,0);
        Object o1 = new Object();
        o1.add_point(a1);
        o1.add_point(a2);
        o1.add_point(a3);
        o1.add_point(a4);
-       g.add_object(o1);
+       //g.rotate(1, Math.PI/2);
+       //o1.info();
+      // g.add_object(o1);
+       //o1.rotate(Math.PI/2);
+      // g.rotate(1, Math.PI/2);
+      // g.rotate(1, Math.PI/2);
        //Object 2
-       Point b1 = new Point(300,300,0);
-       Point b2 = new Point(400,300,0);
+       Point b1 = new Point(250,300,0);
+       Point b2 = new Point(370,300,0);
        Point b3 = new Point(400,400,0);
-       Point b4 = new Point(300,450,0);
+       Point b4 = new Point(330,450,0);
        Object o2 = new Object();
        o2.add_point(b1);
        o2.add_point(b2);
        o2.add_point(b3);
        o2.add_point(b4);
        
-       g.add_object(o2);
+       //g.add_object(o2);
        
        Object o3= new Object();
-       Point c1 = new Point(450,450,0);
-       Point c2 = new Point(490,440,0);
-       Point c3 = new Point(490,470,0);
-       Point c4 = new Point(430,490,0);
+       Point c1 = new Point(350,350,0);
+       Point c2 = new Point(450,350,0);
+       Point c3 = new Point(450,450,0);
+       Point c4 = new Point(350,450,0);
        o3.add_point(c1);
        o3.add_point(c2);
        o3.add_point(c3);
        o3.add_point(c4);
-       g.add_object(o3);
-       
-        Point p = new Point(0,1,0);
-        p.rotate(Math.PI/2);
-        p.info();
-       
-      /*
-        Point a = new Point(100,100,0);
-        //Point a1=  new Point(110,110,0);
-        Point c = new Point(270,270,0);
-        Point d= new Point(50,250,0);
-        Point b = new Point (250,50,0);
-        Object o1 = new Object();
-        o1.add_point(a);
-     
-        o1.add_point(b);
-        //o1.add_point(c);
-        //o1.add_point(d);
-        Object o2 = new Object();
-        Point batata = new Point(100,100,0);
-        //Point batata2 = new Point(450,400,0);
-        //Point batata3 = new Point(490,490,0);
-        //Point batata4 = new Point(400,490,0);
-        o2.add_point(batata);
-        //o2.add_point(batata2);
-        //o2.add_point(batata3);
-        //o2.add_point(batata4);
-        System.out.println("====================================================");
-        //o1.min ();
+    //   g.add_object(o3);
         g.add_object(o1);
         g.add_object(o2);
-       */
+        g.add_object(o3);
+        System.out.println(o1.heuristic());
         
-    Graphics2D g2 = (Graphics2D) gg;
+       
+        
+        Graphics2D g2 = (Graphics2D) gg;
     // draw a rectangle
-   
     double leftX = 55.5;
     double topY = 100;
     double width = 200;
@@ -113,11 +93,11 @@ class MyCanvas extends JComponent {
                g2.setColor(Color.black);
                
            }else{
-             //g2.draw(rect);
+            // g2.draw(rect);
            }
           
         }
-     
+    System.out.println("bouuuu");
    
   }
 
@@ -156,13 +136,12 @@ class Point{
     private boolean flag;
     //added the square id so every point will be recognized by the object it belongs to and vice versa
     private int square_Id=0;
-    public boolean rotatble;
     public Point(double x,double y,int sq_id){
         this.x =x;
         this.y =y;
         this.flag =false;
         square_Id = sq_id;
-        rotatble = false;
+        
         
     }
     public void set_flag(boolean v){
@@ -189,24 +168,35 @@ class Point{
         System.out.println("x = "+x+" , y= "+y+ " belongs to object id= "+ this.square_Id );
     }
     //this function checks if the object is rotatble
-    public boolean is_rotatble(double angle){
-        
-        double a = Math.cos(angle)*this.x -this.y *Math.sin(angle);
-        double b = Math.cos(angle)*this.x -this.y *Math.sin(angle);
-        if(a>0 && b>0){
+    public boolean is_rotatble(double angle,Point o,double xlimits,double ylimits){
+        double a = this.x;
+        double b = this.y;
+        double c = Math.cos(angle);
+        double s = Math.sin(angle);
+        a -= o.x;
+        b -= o.y;
+        double xnew =a*c -b*s;
+        double ynew = a*s +b*c;
+        a = xnew +o.x;
+        b= ynew +o.y;
+        if(a>0 && b>0 && a<xlimits && b<ylimits){
             return true;
         }else{
             return false;
         }
     }
     //this function rotates th object 
-    public void rotate(double angle){   
-        
-        double a = Math.cos(angle)*this.x -this.y *Math.sin(angle);
-        double b = Math.cos(angle)*this.x -this.y *Math.sin(angle);
-        
+    public void rotate90(Point o){   
+        double a = -(this.y-o.y)+o.x;
+        double b =(this.x-o.x)+o.y;
         this.x = a;
         this.y = b;
+    }
+    public void rotate(double angle,Point o){
+        double a =  (this.x-o.x)*Math.cos(angle)-(this.y-o.y)*Math.sin(angle)+o.x;
+        double b = (this.x -o.x)*Math.sin(angle)+ (this.y-o.y)*Math.cos(angle)+o.y;
+        this.x=a;
+        this.y=b;
     }
 }
 class Object{
@@ -237,6 +227,52 @@ class Object{
         xsize_is_at_limits=false;
         ysize_is_at_limits=false;
         colluded = false;
+    }
+    public void limits_info(){
+        System.out.println("x limits reached "+this.x_is_at_limits);
+        System.out.println("xsize limits reached "+this.xsize_is_at_limits);
+        System.out.println("y limits reached "+this.y_is_at_limits);
+        System.out.println("ysize limits reached "+this.ysize_is_at_limits);
+
+
+                
+    }
+   
+    public boolean is_object_rotatable(double angle){
+        for(int i=0;i<this.sequence.size();i++){
+            if(this.sequence.get(i).is_rotatble(angle, this.center(), this.g.x, this.g.y)==false){
+                return false;
+            }
+        }
+        return true;
+    
+    }
+    public boolean is_rotatable(){
+        boolean a = this.is_object_rotatable(Math.PI/2);
+        boolean b = this.is_object_rotatable(-Math.PI/2);
+        boolean c = this.is_object_rotatable(Math.PI);
+        boolean d = this.is_object_rotatable(-Math.PI);
+        if(a==false||b==false||c==false||d==false){
+            return false;
+        }else{
+            return true;
+        }
+
+    }
+    
+    public Point center(){
+        Point p;
+        double x= 0;
+        double y=0;
+        for(int i=0;i<this.sequence.size();i++){
+            x += this.sequence.get(i).get_x();
+            y +=this.sequence.get(i).get_y();
+            
+        }
+        x = x/this.sequence.size();
+        y = y/this.sequence.size();
+        p = new Point(x,y,this.object_Id);
+        return p;
     }
     public double x_heuristic(){
         double h_x=0;
@@ -270,6 +306,7 @@ class Object{
     public boolean ylimits(){
        return this.y_is_at_limits;
     };
+    
     public boolean xsizelimits(){
         return this.xsize_is_at_limits;
     }
@@ -406,6 +443,35 @@ class Object{
            // this line removes the point from the square
             g.m.get(sq).remove_point(this.sequence.get(i));
             this.sequence.get(i).set_y(this.sequence.get(i).get_y()-size);
+            // the sq finds the square of this point
+            String sq2 = g.find_sq_point(this.sequence.get(i));
+           // this line removes the point from the square
+            g.m.get(sq2).add_point(this.sequence.get(i));
+            if(g.m.get(sq2).get_contains_same_object()== false){
+                System.out.println("contains same object "+g.m.get(sq2).get_contains_same_object());
+                                this.colluded = true;
+
+            }
+        }
+        }
+    }
+    //this function rotates an object 90 degrees
+    //using the xlimits might cause a problem
+    //maybe I should use a rotate limit
+    public void rotate(double angle){
+        //System.out.println("getting there");
+        //this.rotation_is_at_limits =false;
+        
+        if(this.is_object_rotatable(angle)==true){
+            //the first statement removes the limits that the object might have had hit  before
+        Point center = this.center();
+        for(int i=0;i<this.sequence.size();i++){
+           // the sq finds the square of this point
+            String sq = g.find_sq_point(this.sequence.get(i));
+           // this line removes the point from the square
+            g.m.get(sq).remove_point(this.sequence.get(i));
+           
+            this.sequence.get(i).rotate(angle,center);
             // the sq finds the square of this point
             String sq2 = g.find_sq_point(this.sequence.get(i));
            // this line removes the point from the square
@@ -654,10 +720,72 @@ class Graph{
             
             if(input.xlimits()==false||input.colluded==true){
             this.translate_right(input.get_Id());}
-            System.out.println("DID OBJECT COLLUDE "+input.colluded);
             return a;
         };
-        
+        Function <Object,Double> rotate90 = (Object input)->{
+            this.rotate(input.get_Id(), Math.PI/2);
+            double a= this.objects_in_square.get(input.get_Id()).heuristic();
+            if(input.colluded==true){
+                this.rotate(input.get_Id(),-Math.PI/2);
+            }
+            return a;
+        };
+        Function <Object,Double> rotatem90 = (Object input)->{
+            this.rotate(input.get_Id(), -Math.PI/2);
+            double a= this.objects_in_square.get(input.get_Id()).heuristic();
+            if(input.colluded==true){
+                this.rotate(input.get_Id(),+Math.PI/2);
+            }
+            return a;
+        };
+        Function <Object,Double> rotate180 = (Object input)->{
+            this.rotate(input.get_Id(), Math.PI);
+            double a= this.objects_in_square.get(input.get_Id()).heuristic();
+            if(input.colluded==true){
+                this.rotate(input.get_Id(),-Math.PI);
+            }
+            return a;
+        };
+        Function <Object,Double> rotatem180 = (Object input)->{
+            this.rotate(input.get_Id(), -Math.PI);
+            double a= this.objects_in_square.get(input.get_Id()).heuristic();
+            if(input.colluded==true){
+                this.rotate(input.get_Id(),+Math.PI);
+            }
+            return a;
+        };
+        Function <Object,Double> rotate45 = (Object input)->{
+            this.rotate(input.get_Id(), Math.PI/4);
+            double a= this.objects_in_square.get(input.get_Id()).heuristic();
+            if(input.colluded==true){
+                this.rotate(input.get_Id(),-Math.PI/4);
+            }
+            return a;
+        };
+        Function <Object,Double> rotatem45 = (Object input)->{
+            this.rotate(input.get_Id(), -Math.PI/4);
+            double a= this.objects_in_square.get(input.get_Id()).heuristic();
+            if(input.colluded==true){
+                this.rotate(input.get_Id(),Math.PI/4);
+            }
+            return a;
+        };
+        Function <Object,Double> rotate135 = (Object input)->{
+            this.rotate(input.get_Id(), 3*Math.PI/4);
+            double a= this.objects_in_square.get(input.get_Id()).heuristic();
+            if(input.colluded==true){
+                this.rotate(input.get_Id(),-3*Math.PI/4);
+            }
+            return a;
+        };
+        Function <Object,Double> rotatem135 = (Object input)->{
+            this.rotate(input.get_Id(), -3*Math.PI/4);
+            double a= this.objects_in_square.get(input.get_Id()).heuristic();
+            if(input.colluded==true){
+                this.rotate(input.get_Id(),3*Math.PI/4);
+            }
+            return a;
+        };
     //this list will contain the actions of the AI ya3ne l functions tab3ul l translate
     java.util.List<Function<Object, Double>> actions = new java.util.ArrayList<>();
     double x;
@@ -680,21 +808,39 @@ class Graph{
     //xvar and yvar lists contain the x and y of that divide the grid 
     java.util.List <Double> xvar = new ArrayList<Double>();
     java.util.List <Double> yvar = new ArrayList<Double>();
-
+    private double heuristic;
+    private double n;
     public Graph(double x,double y,int n){
         this.x =x;
         this.y = y;
         //the number of squares is always a power of 4 
+        heuristic =0;
         this.number_of_squares =Math.pow(4,n);
         square_area = (x*y)/number_of_squares;
         square_size = Math.sqrt(square_area);
+        this.n = n;
         fill_table();
         System.out.println("heyyaaa ");
         actions.add(up);
         actions.add(down);
         actions.add(left);
         actions.add(right);
-       
+        actions.add(rotate90);
+        actions.add(rotatem90);
+        actions.add(rotate180);
+        actions.add(rotatem180);
+        //actions.add(rotate45);
+        //actions.add(rotatem45);
+        //actions.add(rotate135);
+        //actions.add(rotatem135);
+    
+        }
+    public double calculate_heuristic(){
+        //System.out.println("we get here");
+        for(int i=1;i<=this.objects_in_square.size();i++){
+        heuristic += this.objects_in_square.get(i).heuristic();
+        }
+        return this.heuristic;
     }
     // we only use the fill table function once
     //thes function uses the test functions to find the move with the smalles heuristic.
@@ -741,6 +887,30 @@ class Graph{
                 case 3:
                     this.translate_right(object_id);
                     break;
+                case 4:
+                    this.rotate(object_id, Math.PI/2);
+                    break;
+                case 5:
+                    this.rotate(object_id,-Math.PI/2);
+                    break;
+                case 6:
+                    this.rotate(object_id, Math.PI);
+                    break;
+                case 7:
+                    this.rotate(object_id, -Math.PI);
+                    break;
+                case 8:
+                    this.rotate(object_id, Math.PI/4);
+                    break;
+                case 9:
+                    this.rotate(object_id, -Math.PI/4);
+                    break;
+                case 10:
+                    this.rotate(object_id, 3*Math.PI/4);
+                    break;
+                case 11:
+                    this.rotate(object_id, -3*Math.PI/4);
+                    break;
             }
             //System.out.println("best action applied");
             }else{
@@ -757,20 +927,27 @@ class Graph{
               //this while lop is a permenant fix
               System.out.println("we are entering the loop");
               // this is the non classical search function
-              while(nouv<old){
+              /*while(nouv<=old){
                   old= this.objects_in_square.get(object_id).heuristic();
                   this.do_best_move(object_id);
+                  System.out.println("the best move was = "+this.find_best_move(object_id));
                   nouv = this.objects_in_square.get(object_id).heuristic();
-                  //System.out.println("old = "+old);
-                  //System.out.println("nouv = "+nouv);
+                  System.out.println(" i = "+i);
+                  System.out.println("old = "+old);
+                  System.out.println("nouv = "+nouv);
 
                   i++;
-              }
-            /*while(this.objects_in_square.get(object_id).xlimits()==false
-                    &&this.objects_in_square.get(object_id).ylimits()==false){
-
-            this.do_best_move(object_id);
-            } */    
+              }*/
+            i=0;
+            while(this.objects_in_square.get(object_id).xlimits()==false || this.objects_in_square.get(object_id).ylimits()==false||this.objects_in_square.get(object_id).is_rotatable()==false){
+                if(i>1000){
+                break;
+                }
+                this.do_best_move(object_id);
+                System.out.println(i); 
+                i++;
+                
+            }     
         }else{
           
         /*
@@ -872,7 +1049,7 @@ class Graph{
         }
         // the fact that if a point is bigger than the other might be a problem
         // I should add this later when it works
-        this.do_set_of_best_moves(o.get_Id());
+         this.do_set_of_best_moves(o.get_Id());
         }else{
             
             // we add the object to the square
@@ -893,7 +1070,7 @@ class Graph{
             
             while( o.xsizelimits()==false || o.ysizelimits()==false){
                 //if there is a collusion we keep translating the object up and to the right 
-                System.out.println("translate yayyy");
+               // System.out.println("translate yayyy");
                 this.translate_up(o.get_Id());
                 this.translate_right(o.get_Id());
             }
@@ -1128,6 +1305,34 @@ class Graph{
                
             }
     }
+    public void rotate(int object_id,double angle){
+        //first check if the object is in the graph  
+        if(this.objects_in_square.containsKey(object_id)){
+            Object c = this.objects_in_square.get(object_id);
+            if(c.is_object_rotatable(angle)==true){
+               
+               // System.out.println("test thissssssssssssssssss");
+            //this.remove_object(this.objects_in_square.get(object_id));
+          // System.out.println("THIS SHIT SUPPOSEDLY WORKS");
+            this.objects_in_square.get(object_id).rotate(angle);
+            //this.add_object(this.objects_in_square.get(object_id));
+           
+            }else{
+                //System.out.println("current ylimits are true cant move object down ");
+                           // System.out.println("THIS SHIT MIGHT BE WORKING");
+
+            }
+        }else{
+        //    System.out.println("THIS SHIT IS NOT WORKING");
+        }
+        if(this.objects_in_square.get(object_id).colluded==true){
+               this.objects_in_square.get(object_id).colluded=false;
+               
+               this.rotate(object_id,-angle);
+               
+            }
+    }
+   
     
     
 }
